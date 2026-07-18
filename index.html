@@ -5,19 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GEOVISOR PERÚ - Plataforma de Análisis Geospatial</title>
     
-    <!-- Librerías Externas del Código Base e Imagen -->
+    <!-- Librerías GIS y Gráficos -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
         :root {
-            --bg-main: #f4f6f9;
+            --bg-main: #f0f2f5;
             --bg-card: #ffffff;
             --text-dark: #2c3e50;
-            --text-muted: #7f8c8d;
-            --border-color: #eef2f5;
-            --primary-blue: #0f52ba;
-            --success-green: #2ecc71;
+            --text-muted: #95a5a6;
+            --border-color: #e2e8f0;
+            --primary-blue: #2980b9;
+            --success-green: #27ae60;
+            --card-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
         }
 
         * {
@@ -38,135 +39,124 @@
             flex-direction: column;
         }
 
-        /* --- 1. HEADER (De la Imagen 2) --- */
+        /* --- HEADER --- */
         header {
             background-color: var(--bg-card);
             border-bottom: 1px solid var(--border-color);
-            padding: 8px 20px;
+            padding: 0 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            height: 55px;
-            z-index: 1010;
+            height: 50px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            z-index: 1000;
         }
-        .logo-area { display: flex; align-items: center; gap: 10px; }
-        .logo-title { font-weight: bold; font-size: 16px; color: #111; letter-spacing: 0.5px; }
-        .nav-links { display: flex; gap: 15px; list-style: none; }
-        .nav-links a { text-decoration: none; color: var(--text-muted); font-weight: 600; font-size: 12px; }
-        .nav-links a.active { color: var(--primary-blue); border-bottom: 2px solid var(--primary-blue); padding-bottom: 2px; }
+        .logo-area { display: flex; align-items: center; gap: 8px; }
+        .logo-title { font-weight: 700; font-size: 15px; color: #1a202c; letter-spacing: 0.5px; }
+        .nav-links { display: flex; gap: 20px; list-style: none; }
+        .nav-links a { text-decoration: none; color: #718096; font-weight: 600; font-size: 12px; transition: color 0.2s; }
+        .nav-links a:hover, .nav-links a.active { color: var(--primary-blue); }
         .user-profile { display: flex; align-items: center; gap: 8px; }
-        .user-avatar { width: 30px; height: 30px; background: #ccc; border-radius: 50%; }
+        .user-avatar { width: 28px; height: 28px; background: #cbd5e0; border-radius: 50%; }
 
-        /* --- 2. CONTENEDOR PRINCIPAL (Ajuste a Pantalla Completa) --- */
+        /* --- LAYOUT DE 3 COLUMNAS PRINCIPALES --- */
         .dashboard-container {
             display: grid;
-            grid-template-columns: 320px 1fr 320px;
+            grid-template-columns: 310px 1fr 310px;
             gap: 12px;
             padding: 12px;
-            height: calc(100vh - 85px); /* Resta Header y Footer */
+            height: calc(100vh - 50px);
             width: 100vw;
             overflow: hidden;
         }
 
-        /* Paneles de las Columnas Laterales */
+        /* Paneles Laterales Estilizados */
         .panel-lateral {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            padding: 12px;
+            padding: 14px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
             overflow-y: auto;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            box-shadow: var(--card-shadow);
         }
+        
         .panel-title {
             font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
-            color: #111;
+            color: #1a202c;
             border-bottom: 2px solid var(--border-color);
-            padding-bottom: 4px;
-            margin-bottom: 2px;
+            padding-bottom: 5px;
             letter-spacing: 0.5px;
         }
+
         .section-title {
             font-size: 11px;
             font-weight: 700;
-            color: var(--text-dark);
-            margin-top: 4px;
+            color: #4a5568;
+            margin-bottom: 2px;
         }
 
-        /* Componentes de Formularios unificados */
-        .form-group { margin-bottom: 2px; }
-        .form-group label { display: block; font-size: 11px; font-weight: 600; margin-bottom: 3px; color: #555; }
+        /* Formularios alineados */
+        .form-group { margin-bottom: 4px; }
+        .form-group label { display: block; font-size: 11px; font-weight: 600; margin-bottom: 4px; color: #4a5568; }
         .form-control {
             width: 100%;
             padding: 6px 10px;
-            border: 1px solid #dcdde1;
+            border: 1px solid #cbd5e0;
             border-radius: 6px;
             font-size: 11px;
-            background-color: #fafafa;
+            background-color: #f7fafc;
             color: var(--text-dark);
+            outline: none;
         }
+        .form-control:focus { border-color: var(--primary-blue); background-color: #fff; }
         .row-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
-        /* --- Botones Principales --- */
-        .btn-container { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 5px; }
-        .btn { padding: 8px; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; text-align: center; }
-        .btn-primary { background: #3498db; color: #fff; }
-        .btn-secondary { background: #2ecc71; color: #fff; }
+        /* Botones de Acción */
+        .btn-container { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: auto; padding-top: 10px; }
+        .btn { padding: 8px; border: none; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; text-align: center; }
+        .btn-primary { background: #3182ce; color: #fff; }
+        .btn-secondary { background: #38a169; color: #fff; }
 
-        /* --- COLUMNA CENTRAL (Flujo Vertical Organizado) --- */
+        /* --- COLUMNA CENTRAL (Flujo de Datos) --- */
         .center-column {
             display: flex;
             flex-direction: column;
             gap: 12px;
             overflow-y: auto;
-            padding-right: 2px;
         }
 
-        /* Contenedor del Mapa e Info Flotante */
+        /* Mapa de Leaflet */
         .map-wrapper {
-            height: 380px;
-            min-height: 340px;
+            height: 42%;
+            min-height: 260px;
             position: relative;
             border-radius: 8px;
             border: 1px solid var(--border-color);
             overflow: hidden;
-            background: #e5e3df;
+            box-shadow: var(--card-shadow);
         }
-        #map { width: 100%; height: 100%; z-index: 1; }
+        #map { width: 100%; height: 100%; }
         
         .info-overlay {
             position: absolute;
             top: 10px; left: 10px;
             background: rgba(255,255,255,0.95);
-            padding: 10px 15px;
+            padding: 8px 12px;
             border-radius: 6px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             z-index: 1000;
             border-left: 4px solid var(--success-green);
-            width: 220px;
+            width: 210px;
         }
-        .info-overlay h4 { font-size: 11px; margin-bottom: 4px; font-weight: 700; text-transform: uppercase; }
-        .info-overlay p { font-size: 11px; margin-bottom: 2px; display: flex; justify-content: space-between; }
+        .info-overlay h4 { font-size: 10px; margin-bottom: 4px; font-weight: 700; color: #2d3748; }
+        .info-overlay p { font-size: 10px; margin-bottom: 2px; display: flex; justify-content: space-between; color: #4a5568; }
 
-        .toolbar-right {
-            position: absolute;
-            top: 10px; right: 10px;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        .toolbar-btn {
-            width: 32px; height: 32px;
-            background: #fff; border: 1px solid #ccc; border-radius: 6px;
-            cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px;
-        }
-
-        /* --- Fila de 7 Métricas de la Imagen 2 --- */
+        /* Tarjetas de Métricas Ordenadas */
         .metrics-row {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
@@ -176,14 +166,14 @@
             background: #fff;
             border: 1px solid var(--border-color);
             border-radius: 6px;
-            padding: 8px 4px;
+            padding: 8px 6px;
             text-align: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            box-shadow: var(--card-shadow);
         }
-        .metric-lbl { font-size: 9px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
-        .metric-val { font-size: 14px; font-weight: 700; color: #111; margin-top: 3px; }
+        .metric-lbl { font-size: 9px; font-weight: 700; color: #718096; text-transform: uppercase; }
+        .metric-val { font-size: 13px; font-weight: 700; color: #1a202c; margin-top: 2px; }
 
-        /* --- Cuadrícula de Gráficos --- */
+        /* Grid de Gráficos e Historiales */
         .charts-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -193,99 +183,95 @@
             background: #fff;
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            padding: 10px;
-            height: 200px;
+            padding: 12px;
+            height: 180px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
         }
+        .chart-title { font-weight: 700; font-size: 10px; color: #718096; margin-bottom: 8px; text-transform: uppercase; }
+
         .chart-box-wide {
             background: #fff;
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            padding: 10px;
+            padding: 12px;
             height: 140px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            margin-top: auto;
         }
 
-        /* --- Tablas e Historiales --- */
+        /* Tablas Limpias */
         .table-container {
-            max-height: 120px;
+            flex: 1;
             overflow-y: auto;
             border: 1px solid var(--border-color);
-            border-radius: 4px;
+            border-radius: 6px;
         }
         .data-table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; }
-        .data-table th { position: sticky; top: 0; background: #f4f6f9; padding: 6px; font-weight: 750; border-bottom: 2px solid var(--border-color); }
-        .data-table td { padding: 5px 6px; border-bottom: 1px solid var(--border-color); }
+        .data-table th { position: sticky; top: 0; background: #f7fafc; padding: 6px 8px; font-weight: 700; color: #4a5568; border-bottom: 2px solid var(--border-color); }
+        .data-table td { padding: 6px 8px; border-bottom: 1px solid var(--border-color); color: #2d3748; }
+        .data-table tr:hover { background: #f8fafc; }
 
-        /* Descargas */
+        /* Formato de Descarga */
         .container-descargas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-        .btn-download { padding: 6px; font-size: 10px; border: 1px solid #dcdde1; background: #fff; border-radius: 4px; cursor: pointer; font-weight: 600; text-align: center;}
-
-        /* --- 3. FOOTER (Fijo inferior) --- */
-        footer {
-            background: var(--bg-card);
-            border-top: 1px solid var(--border-color);
-            padding: 4px 20px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 11px;
-            color: var(--text-muted);
-            height: 30px;
-            align-items: center;
-            z-index: 1010;
-        }
+        .btn-download { padding: 6px; font-size: 10px; border: 1px solid #cbd5e0; background: #fff; border-radius: 6px; cursor: pointer; font-weight: 600; text-align: center; transition: background 0.2s; }
+        .btn-download:hover { background: #f7fafc; }
 
         /* Loader */
-        #loader { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(44, 62, 80, 0.9); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; font-size: 1.2rem; }
-        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 10px; }
+        #loader { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(26, 32, 44, 0.85); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; font-size: 13px; font-weight: 600; }
+        .spinner { width: 35px; height: 35px; border: 3px solid #e2e8f0; border-top: 3px solid #3182ce; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 10px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <!-- LOADER DE ENTRADA -->
+    <!-- LOADER -->
     <div id="loader">
         <div class="spinner"></div>
-        <p>Inicializando recursos GIS...</p>
+        <p>Procesando datos geoespaciales...</p>
     </div>
 
-    <!-- HEADER SUPERIOR -->
+    <!-- NAVBAR SUPERIOR -->
     <header>
         <div class="logo-area">
-            <div style="font-size:20px;">🔷</div>
+            <div style="font-size:18px; color: var(--primary-blue);">🌍</div>
             <div>
                 <div class="logo-title">GEOVISOR PERÚ</div>
-                <div style="font-size:9px; color:var(--text-muted); font-weight:600;">Plataforma de Análisis Geospatial</div>
+                <div style="font-size:9px; color:#718096; font-weight:600;">Plataforma de Análisis Geospatial</div>
             </div>
         </div>
         <nav>
             <ul class="nav-links">
-                <li><a href="#">Inisto</a></li>
+                <li><a href="#">Inicio</a></li>
                 <li><a href="#" class="active">Mapa</a></li>
                 <li><a href="#">Análisis</a></li>
                 <li><a href="#">Reportes</a></li>
                 <li><a href="#">Descargas</a></li>
-                <li><a href="#">Acerca de</a></li>
                 <li><a href="#">Ayuda</a></li>
             </ul>
         </nav>
         <div class="user-profile">
             <div class="user-avatar"></div>
             <div>
-                <div style="font-weight:bold; font-size:11px;">Alessandro Ahualla</div>
-                <div style="font-size:10px; color:var(--text-muted);">Investigador <span style="font-size:9px;">v3.0</span></div>
+                <div style="font-weight:700; font-size:11px;">Alessandro Ahualla</div>
+                <div style="font-size:9px; color:#718096;">Investigador Gis v3.0</div>
             </div>
         </div>
     </header>
 
-    <!-- CONTENEDOR GRID DE 3 COLUMNAS -->
+    <!-- PANEL GRID CONTENEDOR -->
     <div class="dashboard-container">
         
-        <!-- COLUMNA IZQUIERDA: CONFIGURACIÓN -->
+        <!-- IZQUIERDA: MENÚ CONFIGURACIÓN -->
         <aside class="panel-lateral">
             <div class="panel-title">📋 CONFIGURACIÓN DE ANÁLISIS</div>
             
             <div class="section-title">1. ENFOQUE DE CONSULTA</div>
             <div class="form-group">
-                <label for="tipoConsulta">Modalidad de Análisis</label>
+                <label>Modalidad de Análisis</label>
                 <select id="tipoConsulta" class="form-control">
                     <option value="politico">División Político-Administrativa</option>
                     <option value="conservacion">Áreas Naturales y Conservación (AMPs)</option>
@@ -295,72 +281,54 @@
             <div class="section-title">2. LÍMITES CARTOGRÁFICOS</div>
             <div id="grupoPolitico">
                 <div class="form-group">
-                    <label for="departamento">Departamento</label>
+                    <label>Departamento</label>
                     <select id="departamento" class="form-control">
-                        <option value="Seleccione...">Seleccione Departamento...</option>
+                        <option>Apurímac</option>
                     </select>
                 </div>
                 <div class="row-grid">
                     <div class="form-group">
-                        <label for="provincia">Provincia</label>
-                        <select id="provincia" class="form-control"><option value="Seleccione...">Seleccione...</option></select>
+                        <label>Provincia</label>
+                        <select id="provincia" class="form-control"><option>Andahuaylas</option></select>
                     </div>
                     <div class="form-group">
-                        <label for="distrito">Distrito</label>
-                        <select id="distrito" class="form-control"><option value="Seleccione...">Seleccione...</option></select>
+                        <label>Distrito</label>
+                        <select id="distrito" class="form-control"><option>San Antonio de Cachi</option></select>
                     </div>
                 </div>
             </div>
 
-            <div id="grupoAmbiental" style="display: none;">
-                <div class="form-group">
-                    <label for="capaAmbiental">Categoría de Conservación</label>
-                    <select id="capaAmbiental" class="form-control">
-                        <option value="Seleccione...">Seleccione...</option>
-                        <option value="acp">Áreas de Conservación Privada (ACP)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="nombreArea">Área de Estudio Específica</label>
-                    <select id="nombreArea" class="form-control" disabled>
-                        <option value="Seleccione...">BOSQUE NATURAL EL CAÑONCILLO</option>
-                    </select>
-                </div>
-            </div>
-
-            <div style="background:#eef9f1; padding:8px; border-radius:6px; font-size:10px; border:1px solid #d4eed8;">
-                <strong style="color:#27ae60;">ℹ️ INFORMACIÓN DEL ÁREA</strong><br>
-                Categoría: Bosque Natural D. Privada<br>
-                Ubigeo/Lugar: La Libertad / Pacasmayo<br>
-                Área Oficial: 15.01 km²
+            <div style="background:#f0fff4; padding:8px; border-radius:6px; font-size:10px; border:1px solid #c6f6d5;">
+                <strong style="color:var(--success-green);">ℹ️ INFORMACIÓN DEL ÁREA</strong><br>
+                Categoría: Distrito Seleccionado<br>
+                Región/Sector: Sierra Sur Central / Apurímac
             </div>
 
             <div class="section-title">3. PARÁMETROS DE MISIÓN</div>
             <div class="form-group">
-                <label for="satelite">Sensor Satelital</label>
+                <label>Sensor Satelital</label>
                 <select id="satelite" class="form-control">
-                    <option value="Landsat 5">Landsat 5 TM (1984 - 2011)</option>
-                    <option value="Landsat 8">Landsat 8 OLI</option>
+                    <option>Landsat 5 TM (1984 - 2011)</option>
                 </select>
             </div>
             <div class="form-group">
-                <label for="objetivo">Objetivo del Estudio</label>
-                <select id="objetivo" class="form-control"><option value="Vegetación">Análisis de Vegetación</option></select>
+                <label>Objetivo del Estudio</label>
+                <select id="objetivo" class="form-control"><option>Análisis de Vegetación</option></select>
             </div>
             <div class="form-group">
-                <label for="indice">Índice Espectral</label>
-                <select id="indice" class="form-control"><option value="NDVI">NDVI</option></select>
+                <label>Índice Espectral</label>
+                <select id="indice" class="form-control"><option>NDVI</option></select>
             </div>
 
             <div class="section-title">4. TEMPORALIDAD DE ANÁLISIS</div>
             <div class="row-grid">
-                <div class="form-group"><label>Año Inicial</label><select id="anioInicio" class="form-control"></select></div>
-                <div class="form-group"><label>Año Final</label><select id="anioFinal" class="form-control"></select></div>
+                <div class="form-group"><label>Año Inicial</label><select id="anioInicio" class="form-control"><option>1984</option></select></div>
+                <div class="form-group"><label>Año Final</label><select id="anioFinal" class="form-control"><option>2011</option></select></div>
             </div>
 
             <div class="section-title">5. EXPORTACIÓN CIENTÍFICA</div>
             <div class="container-descargas">
-                <button id="btnTiff" class="btn-download">💾 GeoTIFF</button>
+                <button id="btnTiff" class="btn-download">💾 TIFF</button>
                 <button id="btnShp" class="btn-download">📦 SHP</button>
                 <button id="btnPng" class="btn-download">📸 PNG</button>
                 <button id="btnPdf" class="btn-download">📄 PDF</button>
@@ -372,93 +340,78 @@
             </div>
         </aside>
 
-        <!-- COLUMNA CENTRAL: MAPA, MÉTRICAS Y GRÁFICOS -->
+        <!-- CENTRO: MAPA, MÉTRICAS Y GRÁFICOS -->
         <main class="center-column">
             
-            <!-- Bloque de Mapa -->
             <div class="map-wrapper">
                 <div id="map"></div>
-                
                 <div class="info-overlay">
                     <h4>🟢 CAPA ACTIVA - GEE</h4>
                     <p>Índice Espectral: <span id="indiceNombre">NDVI</span></p>
-                    <p>Plataforma Sensor: <span id="sensor">Landsat 5 TM</span></p>
-                    <p>Resolución espacial: <span>30 metros</span></p>
-                    <p>Periodo analizado: <span id="anio">1994 - 2011</span></p>
-                </div>
-
-                <div class="toolbar-right">
-                    <button class="toolbar-btn" title="Mapa Base">🗺</button>
-                    <button class="toolbar-btn" title="Ubicación">📍</button>
-                    <button class="toolbar-btn" title="Completa">📺</button>
+                    <p>Plataforma: <span id="sensor">Landsat 5 TM</span></p>
+                    <p>Resolución: <span>30 metros</span></p>
+                    <p>Periodo: <span id="anio">1984 - 2011</span></p>
                 </div>
             </div>
 
-            <!-- Fila Horizontal de 7 Métricas de la Imagen -->
+            <!-- Fila de métricas ajustadas e idénticas -->
             <div class="metrics-row">
-                <div class="metric-card"><div class="metric-lbl">ÁREA DE ESTUDIO</div><div class="metric-val" id="resArea">15.01 km²</div></div>
-                <div class="metric-card"><div class="metric-lbl">VALOR PROMEDIO</div><div class="metric-val" id="resProm">0.064</div></div>
+                <div class="metric-card"><div class="metric-lbl">ÁREA DE ESTUDIO</div><div class="metric-val" id="resArea">179.23 km²</div></div>
+                <div class="metric-card"><div class="metric-lbl">VALOR PROMEDIO</div><div class="metric-val" id="resProm">0.122</div></div>
                 <div class="metric-card"><div class="metric-lbl">VALOR MEDIANA</div><div class="metric-val">0.671</div></div>
                 <div class="metric-card"><div class="metric-lbl">DESV. ESTÁNDAR</div><div class="metric-val">0.033</div></div>
-                <div class="metric-card"><div class="metric-lbl">VALOR MÍNIMO</div><div class="metric-val" id="resMin">-0.028</div></div>
-                <div class="metric-card"><div class="metric-lbl">VALOR MÁXIMO</div><div class="metric-val" id="resMax">0.294</div></div>
-                <div class="metric-card"><div class="metric-lbl">FECHA DE ANÁLISIS</div><div class="metric-val" style="font-size:10px;">16/07/2026</div></div>
+                <div class="metric-card"><div class="metric-lbl">VALOR MÍNIMO</div><div class="metric-val" id="resMin">-0.044</div></div>
+                <div class="metric-card"><div class="metric-lbl">VALOR MÁXIMO</div><div class="metric-val" id="resMax">0.325</div></div>
+                <div class="metric-card"><div class="metric-lbl">FECHA ANÁLISIS</div><div class="metric-val" style="font-size:10px;">18/07/2026</div></div>
             </div>
 
-            <!-- Cuadrícula de Gráficos Interactivos -->
+            <!-- Cuadrícula de Gráficos perfectamente simétricos -->
             <div class="charts-grid">
                 <div class="chart-box">
-                    <span style="font-weight:700; font-size:10px; color:var(--text-muted);">DISTRIBUCIÓN DE CLASES NDVI</span>
-                    <canvas id="pieChart" style="max-height:165px; margin-top:5px;"></canvas>
+                    <div class="chart-title">DISTRIBUCIÓN DE CLASES NDVI</div>
+                    <canvas id="pieChart"></canvas>
                 </div>
                 <div class="chart-box">
-                    <span style="font-weight:700; font-size:10px; color:var(--text-muted);">HISTOGRAMA NDVI</span>
-                    <canvas id="barChart" style="max-height:165px; margin-top:5px;"></canvas>
+                    <div class="chart-title">HISTOGRAMA NDVI</div>
+                    <canvas id="barChart"></canvas>
                 </div>
             </div>
 
-            <!-- Gráfico de Tendencia Ancho -->
             <div class="chart-box-wide">
-                <span style="font-weight:700; font-size:10px; color:var(--text-muted);">GRÁFICO TEMPORAL DE TENDENCIAS</span>
-                <canvas id="lineChart" style="max-height:115px;"></canvas>
+                <div class="chart-title">GRÁFICO TEMPORAL DE TENDENCIAS</div>
+                <canvas id="lineChart"></canvas>
             </div>
 
         </main>
 
-        <!-- COLUMNA DERECHA: CALIDAD, ESCENAS E HISTORIAL -->
+        <!-- DERECHA: CALIDAD, ESCENAS E HISTORIAL -->
         <aside class="panel-lateral">
             <div class="panel-title">⭐ CALIDAD DEL ANÁLISIS</div>
-            <div style="background:#f8f9fa; padding:8px; border-radius:6px; display:flex; flex-direction:column; gap:4px;">
-                <div>Cobertura nubosa Promedio: <strong>8.7%</strong></div>
-                <div>Escenas válidas: <strong>127</strong></div>
-                <div style="color:var(--success-green); font-weight:700; margin-top:2px;">Análisis EXCELENTE ⭐⭐⭐⭐⭐</div>
+            <div style="background:#f7fafc; padding:10px; border-radius:6px; border:1px solid var(--border-color);">
+                <div style="margin-bottom:3px;">Cobertura Nubosa Promedio: <strong>8.7%</strong></div>
+                <div style="margin-bottom:5px;">Escenas procesadas: <strong>127</strong></div>
+                <div style="color:var(--success-green); font-weight:700;">Análisis EXCELENTE ⭐⭐⭐⭐⭐</div>
             </div>
 
             <div class="panel-title">🎬 ESCENAS UTILIZADAS</div>
-            <div class="table-container" style="max-height: 160px;">
+            <div class="table-container">
                 <table class="data-table">
-                    <thead>
-                        <tr><th>ID Escena</th><th>Nubes</th></tr>
-                    </thead>
+                    <thead><tr><th>ID Escena</th><th>Nubes</th></tr></thead>
                     <tbody>
                         <tr><td>LT05_L1TP_006007_19940211</td><td>5.2%</td></tr>
                         <tr><td>LT05_L1TP_006007_19990113</td><td>3.1%</td></tr>
                         <tr><td>LT05_L1TP_006007_20050315</td><td>8.1%</td></tr>
-                        <tr><td>LT05_L1TP_006007_20110517</td><td>7.1%</td></tr>
                     </tbody>
                 </table>
             </div>
 
             <div class="panel-title">📜 HISTORIAL DE CONSULTAS</div>
-            <div class="table-container" style="max-height: 160px;">
+            <div class="table-container">
                 <table class="data-table">
-                    <thead>
-                        <tr><th>Dep.</th><th>Prov.</th><th>Ind.</th><th>Sat.</th></tr>
-                    </thead>
+                    <thead><tr><th>Dep.</th><th>Prov.</th><th>Ind.</th><th>Sat.</th></tr></thead>
                     <tbody id="tablaResultados">
-                        <!-- Tu app.js inyectará datos aquí de forma dinámica -->
-                        <tr><td>Ucayali</td><td>Coronel Portillo</td><td>NDVI</td><td>Landsat 5</td></tr>
-                        <tr><td>Loreto</td><td>Maynas</td><td>EVI</td><td>Landsat 8</td></tr>
+                        <tr><td>Apurímac</td><td>Andahuaylas</td><td>NDVI</td><td>Landsat 5</td></tr>
+                        <tr><td>Apurímac</td><td>Abancay</td><td>NDVI</td><td>Landsat 5</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -466,31 +419,23 @@
 
     </div>
 
-    <!-- FOOTER INFERIOR -->
-    <footer>
-        <div><strong>GEOVISOR PERÚ v3.0</strong> | Plataforma de análisis espacial para investigación y conservación ambiental.</div>
-        <div>Datos: Google Earth Engine | Desarrollado por Alessandro Ahualla Molina</div>
-    </footer>
-
-    <!-- Scripts de Leaflet y Captura -->
+    <!-- Scripts GIS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
-    <!-- Scripts Propios que ya tenías vinculados -->
     <script src="js/ubigeo.js"></script>
     <script src="js/app.js"></script>
 
-    <!-- RENDERIZADOR AUTOMÁTICO DE LOS GRÁFICOS (Chart.js) -->
+    <!-- RENDERIZADO Y CONTROL DE GRÁFICOS -->
     <script>
-        // Remover el loader cuando cargue la página simulando tus recursos
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
-                document.getElementById('loader').style.opacity = '0';
-                setTimeout(() => document.getElementById('loader').style.display = 'none', 300);
-            }, 800);
+                const loader = document.getElementById('loader');
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 300);
+            }, 500);
         });
 
-        // Gráfico Circular (Distribución)
+        // Gráfico Circular
         new Chart(document.getElementById('pieChart'), {
             type: 'doughnut',
             data: {
@@ -503,29 +448,28 @@
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 9 } } } } }
         });
 
-        // Gráfico de Barras (Histograma)
+        // Histograma
         new Chart(document.getElementById('barChart'), {
             type: 'bar',
             data: {
-                labels: ['-0.2', '0.0', '0.2', '0.4', '0.6', '0.8'],
+                labels: ['-0.2', '0.0', '0.2', '0.4', '0.6'],
                 datasets: [{
-                    data: [120, 500, 1500, 2400, 900, 300],
+                    data: [150, 600, 1400, 2200, 700],
                     backgroundColor: '#34495e'
                 }]
             },
             options: { responsive: true, maintainAspectRatio: false, scales: { y: { display: false } }, plugins: { legend: { display: false } } }
         });
 
-        // Gráfico de Líneas (Tendencias)
+        // Tendencia
         new Chart(document.getElementById('lineChart'), {
             type: 'line',
             data: {
-                labels: ['1994', '1998', '2002', '2006', '2010', '2011'],
+                labels: ['1984', '1990', '1996', '2002', '2008', '2011'],
                 datasets: [{
-                    label: 'Media NDVI',
-                    data: [0.54, 0.61, 0.58, 0.65, 0.62, 0.67],
-                    borderColor: '#0f52ba',
-                    backgroundColor: 'rgba(15, 82, 186, 0.1)',
+                    data: [0.54, 0.58, 0.61, 0.59, 0.64, 0.67],
+                    borderColor: '#2980b9',
+                    backgroundColor: 'rgba(41, 128, 185, 0.05)',
                     fill: true,
                     tension: 0.1
                 }]
