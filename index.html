@@ -167,7 +167,7 @@
         }
         .analytics-card { background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 10px; display: flex; flex-direction: column; overflow: hidden; }
         .analytics-card h3 { font-size: 0.65rem; font-weight: 800; color: white; text-transform: uppercase; margin-bottom: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 4px; }
-        .chart-container-wrapper { flex: 1; position: relative; width: 100%; height: 100%; }
+        .chart-container-wrapper { flex: 1; relative; width: 100%; height: 100%; }
 
         /* TABLA RESUMEN TEMPORAL INTERNA */
         .summary-mini-table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 0.55rem; text-align: center; }
@@ -463,16 +463,11 @@
                     <h3>Estadísticas Descriptivas</h3>
                     <div class="chart-container-wrapper" style="overflow-y:auto;">
                         <table class="summary-mini-table">
-                            <thead>
-                                <tr><th>Métrica</th><th>Valor Calculado</th></tr>
-                            </thead>
-                            <tbody>
-                                <tr><td>Media Aritmética</td><td>0.0642</td></tr>
-                                <tr><td>Mediana Estadística</td><td>0.0711</td></tr>
-                                <tr><td>Varianza Poblacional</td><td>0.0019</td></tr>
-                                <tr><td>Rango Dinámico Delta</td><td>0.3190</td></tr>
-                                <tr><td>Coeficiente Variación</td><td>14.2%</td></tr>
-                            </tbody>
+                            <tr><th>Métrica</th><th>Valor</th></tr>
+                            <tr><td>Media</td><td>0.064</td></tr>
+                            <tr><td>Mediana</td><td>0.071</td></tr>
+                            <tr><td>Varianza</td><td>0.0019</td></tr>
+                            <tr><td>Rango</td><td>0.294</td></tr>
                         </table>
                     </div>
                 </div>
@@ -506,11 +501,6 @@
                     <div class="scene-item">LT05_L1TP_006007_19960315<span>8.1%</span></div>
                     <div class="scene-item">LT05_L1TP_006007_19970517<span>7.1%</span></div>
                     <div class="scene-item">LT05_L1TP_006007_19980824<span>6.1%</span></div>
-                    <div class="scene-item">LT05_L1TP_006007_20001102<span>4.3%</span></div>
-                    <div class="scene-item">LT05_L1TP_006007_20020412<span>2.9%</span></div>
-                    <div class="scene-item">LT05_L1TP_006007_20050918<span>1.1%</span></div>
-                    <div class="scene-item">LT05_L1TP_006007_20080622<span>0.0%</span></div>
-                    <div class="scene-item">LT05_L1TP_006007_20111005<span>3.4%</span></div>
                 </div>
             </div>
         </div>
@@ -528,192 +518,25 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <!-- LÓGICA CORE DE LA APLICACIÓN -->
     <script>
-        // Declaración global de instancias cartográficas y analíticas
-        let map, geojsonLayer, clasesChart, histogramaChart, tendenciasChart;
-
-        // Datos Simulación Satelital Reales (Cañoncillo Landsat 5)
-        const areaData = {
-            polygon: {
-                "type": "FeatureCollection",
-                "features": [
-                    {
-                        "type": "Feature",
-                        "properties": { "name": "ACP El Cañoncillo", "area_ha": 1301.4 },
-                        "geometry": {
-                            "type": "Polygon",
-                            "coordinates": [[
-                                [-79.45, -7.35],
-                                [-79.41, -7.35],
-                                [-79.41, -7.39],
-                                [-79.45, -7.39],
-                                [-79.45, -7.35]
-                            ]]
-                        }
-                    }
-                ]
-            }
-        };
-
-        // Evento de Inicialización DOM
+        // Simulación Core e Interface Switchers
         window.addEventListener('DOMContentLoaded', () => {
-            // Eliminar pantalla de carga
             setTimeout(() => {
                 const loader = document.getElementById('loader');
-                if(loader) {
-                    loader.style.opacity = '0';
-                    setTimeout(() => loader.remove(), 400);
-                }
+                if(loader) loader.style.opacity = '0';
+                setTimeout(() => loader.remove(), 400);
             }, 1000);
 
-            // 1. Inicializar Mapa Base (Leaflet)
-            map = L.map('map', {
-                zoomControl: false,
-                attributionControl: false
-            }).setView([-7.37, -79.43], 13);
+            // Renderizado de Gráficos de Prueba para rellenar los componentes del Grid Analítico
+            const ctx1 = document.getElementById('chartClases').getContext('2d');
+            new Chart(ctx1, { type: 'doughnut', data: { labels: ['Alta','Media','Baja'], datasets: [{ data: [60, 25, 15], backgroundColor: ['#10b981','#f59e0b','#ef4444'] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
 
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                maxZoom: 20
-            }).addTo(map);
+            const ctx2 = document.getElementById('chartHistograma').getContext('2d');
+            new Chart(ctx2, { type: 'bar', data: { labels: ['-0.2','0','0.2','0.4','0.6'], datasets: [{ data: [4, 12, 35, 70, 15], backgroundColor: '#2563eb' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
 
-            L.control.zoom({ position: 'bottomleft' }).addTo(map);
-
-            // Pintar área por defecto en el arranque
-            geojsonLayer = L.geoJSON(areaData.polygon, {
-                style: {
-                    color: '#10b981',
-                    weight: 2,
-                    fillColor: '#10b981',
-                    fillOpacity: 0.15
-                }
-            }).addTo(map);
-
-            // 2. Inicializar los 3 Gráficos con Datos Reales Simulados
-            initAnalyticsCharts();
-
-            // 3. Vincular los Eventos de los Botones de Descarga e Interfaz
-            setupEventHandlers();
+            const ctx3 = document.getElementById('chartTendencias').getContext('2d');
+            new Chart(ctx3, { type: 'line', data: { labels: ['1994','2000','2006','2011'], datasets: [{ data: [0.05, 0.058, 0.062, 0.064], borderColor: '#10b981', tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
         });
-
-        // Configuración y Renderizado de Componentes de Chart.js
-        function initAnalyticsCharts() {
-            // Gráfico 1: Distribución de Clases (Doughnut)
-            const ctxClases = document.getElementById('chartClases').getContext('2d');
-            clasesChart = new Chart(ctxClases, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Suelo Desnudo / Agua', 'Vegetación Baja', 'Vegetación Moderada / Alta'],
-                    datasets: [{
-                        data: [45, 35, 20],
-                        backgroundColor: ['#ef4444', '#f59e0b', '#10b981'],
-                        borderWidth: 1,
-                        borderColor: '#111827'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'bottom',
-                            labels: { color: '#9ca3af', boxWidth: 12, font: { size: 9 } }
-                        }
-                    }
-                }
-            });
-
-            // Gráfico 2: Histograma NDVI (Bar)
-            const ctxHist = document.getElementById('chartHistograma').getContext('2d');
-            histogramaChart = new Chart(ctxHist, {
-                type: 'bar',
-                data: {
-                    labels: ['-0.1', '0.0', '0.1', '0.2', '0.3', '0.4'],
-                    datasets: [{
-                        label: 'Frecuencia de Píxeles',
-                        data: [1200, 4300, 6800, 3100, 950, 200],
-                        backgroundColor: 'rgba(59, 130, 246, 0.65)',
-                        borderColor: '#2563eb',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: { grid: { display: false }, ticks: { color: '#9ca3af', font: { size: 8 } } },
-                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9ca3af', font: { size: 8 } } }
-                    },
-                    plugins: { legend: { display: false } }
-                }
-            });
-
-            // Gráfico 3: Resumen Temporal Multianual (Line)
-            const ctxTend = document.getElementById('chartTendencias').getContext('2d');
-            tendenciasChart = new Chart(ctxTend, {
-                type: 'line',
-                data: {
-                    labels: ['1994', '1998', '2002', '2006', '2010', '2011'],
-                    datasets: [{
-                        label: 'Media NDVI',
-                        data: [0.052, 0.058, 0.061, 0.059, 0.063, 0.0642],
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.05)',
-                        borderWidth: 2,
-                        tension: 0.2,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: { grid: { display: false }, ticks: { color: '#9ca3af', font: { size: 8 } } },
-                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9ca3af', font: { size: 8 } } }
-                    },
-                    plugins: { legend: { display: false } }
-                }
-            });
-        }
-
-        // Manejadores de Eventos del Sistema
-        function setupEventHandlers() {
-            // Botón Consultar Principal
-            document.getElementById('consultar').addEventListener('click', () => {
-                alert('Ejecutando script de reducción temporal mediana en Google Earth Engine...');
-                // Aquí se inyectaría la lógica de actualización dinâmica de datos si fuese necesario.
-            });
-
-            // Botón Limpiar Interfaz
-            document.getElementById('limpiar').addEventListener('click', () => {
-                if(geojsonLayer) map.removeLayer(geojsonLayer);
-                alert('Filtros e interfaz reseteados con éxito.');
-            });
-
-            // Descarga de Imagen PNG del Visor Completo via Html2Canvas
-            document.getElementById('btnPng').addEventListener('click', () => {
-                html2canvas(document.body).then(canvas => {
-                    const link = document.createElement('a');
-                    link.download = 'GEOVISOR_PERU_PRO_Capture.png';
-                    link.href = canvas.toDataURL();
-                    link.click();
-                });
-            });
-
-            // Simuladores de Descargas Científicas GeoTIFF y SHP
-            document.getElementById('btnTiff').addEventListener('click', () => {
-                alert('Generando URL de descarga desde Google Earth Engine Asset...\nFormato: GeoTIFF (Float32)\nResolución: 30m');
-            });
-
-            document.getElementById('btnShp').addEventListener('click', () => {
-                alert('Exportando geometrías vectoriales...\nArchivo: ACP_El_Canoncillo_Bounds.zip (Contiene .shp, .dbf, .shx, .prj)');
-            });
-
-            document.getElementById('btnPdf').addEventListener('click', () => {
-                alert('Compilando reporte científico automatizado en PDF con metadatos estructurados e información estadística.');
-            });
-        }
     </script>
 </body>
 </html>
