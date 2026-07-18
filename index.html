@@ -3,490 +3,553 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GEOVISOR PERÚ PRO v3.0 - Plataforma de Análisis Geospatial</title>
+    <title>GEOVISOR PERÚ PRO v3.0 - Advanced Geospatial Analytics Platform</title>
     
-    <!-- Librerías de Mapas e Iconos -->
+    <!-- Hojas de Estilo - Core e Iconografía -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap">
     
     <style>
         /*============================================================================
-          CORE DE DISEÑO TÁCTICO - MONITORES ULTRA-ANÁLISIS
+          SISTEMA DE DISEÑO AVANZADO - VARIABLES DE ENTORNO (CSS MODERN)
         ============================================================================*/
         :root {
-            --bg-body: #0a0d1a;
-            --bg-panel: #111625;
-            --bg-subpanel: #161d31;
-            --bg-input: #0d111e;
-            --border-ui: rgba(255, 255, 255, 0.06);
-            --border-active: #2563eb;
+            --bg-main: #060814;
+            --bg-sidebar: #0b0f1f;
+            --bg-surface: #12182d;
+            --bg-surface-hover: #1b233d;
+            --border-color: rgba(255, 255, 255, 0.07);
+            --border-color-active: rgba(59, 130, 246, 0.4);
             
-            --text-title: #ffffff;
-            --text-body: #cbd5e1;
+            --text-pure: #ffffff;
+            --text-primary: #f1f5f9;
             --text-muted: #64748b;
-            
-            --accent-blue: #3b82f6;
-            --accent-green: #10b981;
-            --accent-orange: #f59e0b;
-            --accent-red: #ef4444;
-            
-            --font-main: 'Plus Jakarta Sans', sans-serif;
-            --font-code: 'JetBrains Mono', monospace;
-            --radius-main: 6px;
+            --text-glow: #3b82f6;
+
+            --brand-primary: #2563eb;
+            --brand-glow: rgba(37, 99, 235, 0.35);
+            --accent-success: #10b981;
+            --accent-warning: #f59e0b;
+            --accent-danger: #ef4444;
+            --accent-purple: #8b5cf6;
+
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --shadow-subtle: 0 4px 20px rgba(0, 0, 0, 0.4);
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --radius-sm: 6px;
+            --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-main); }
-        body { background-color: var(--bg-body); color: var(--text-body); display: flex; flex-direction: column; width: 100vw; height: 100vh; overflow: hidden; font-size: 0.75rem; }
+        /* RESET GENERAL DE PANTALLA */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+        body { background-color: var(--bg-main); color: var(--text-primary); display: flex; width: 100vw; height: 100vh; overflow: hidden; padding: 12px; gap: 12px; }
+
+        /* INTERFAZ DEL SKELETON LOADER */
+        #loader { position: fixed; inset: 0; background: var(--bg-main); z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 16px; transition: opacity 0.4s ease; }
+        .spinner-container { position: relative; width: 64px; height: 64px; }
+        .spinner-outer { width: 100%; height: 100%; border: 3px solid transparent; border-top-color: var(--brand-primary); border-radius: 50%; animation: spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite; }
+        .spinner-inner { position: absolute; inset: 8px; border: 3px solid transparent; border-bottom-color: var(--accent-success); border-radius: 50%; animation: spin-reverse 0.9s linear infinite; }
+        #loader p { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
 
         /*============================================================================
-          1. HEADER SUPERIOR COMPLETO (IDÉNTICO A LA REFERENCIA)
+          SIDEBAR ESTRUCTURAL TÁCTICO IZQUIERDO
         ============================================================================*/
-        header {
-            height: 50px; background: var(--bg-panel); border-bottom: 1px solid var(--border-ui);
-            display: flex; align-items: center; justify-content: space-between; padding: 0 16px; z-index: 1000;
+        #sidebar { 
+            width: 410px; 
+            min-width: 410px;
+            height: 100%;
+            background: var(--bg-sidebar); 
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-subtle);
+            display: flex; 
+            flex-direction: column; 
+            z-index: 100; 
+            overflow: hidden;
         }
-        .header-brand { display: flex; align-items: center; gap: 10px; }
-        .header-brand .logo { width: 28px; height: 28px; background: var(--accent-blue); clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
-        .header-brand h1 { font-size: 1.1rem; font-weight: 800; color: var(--text-title); letter-spacing: 0.5px; }
-        .header-brand span { font-size: 0.65rem; color: var(--text-muted); margin-left: 8px; }
-        
-        .header-nav { display: flex; gap: 4px; }
-        .nav-link { padding: 6px 14px; color: var(--text-body); text-decoration: none; border-radius: 4px; font-weight: 500; display: flex; align-items: center; gap: 6px; transition: all 0.2s; }
-        .nav-link.active { background: #1e293b; color: var(--accent-blue); border-bottom: 2px solid var(--accent-blue); }
-        .nav-link:hover:not(.active) { background: rgba(255,255,255,0.02); }
 
-        .header-user { display: flex; align-items: center; gap: 10px; }
-        .user-avatar { width: 28px; height: 28px; border-radius: 50%; background: #475569; border: 1px solid var(--accent-blue); }
-        .user-info { font-size: 0.7rem; text-align: right; }
-        .user-info .name { color: var(--text-title); font-weight: 600; display: block; }
-        .user-info .role { color: var(--text-muted); font-size: 0.6rem; }
+        /* Encabezado Corporativo */
+        .brand-header { 
+            padding: 20px; 
+            background: linear-gradient(135deg, #111827 0%, #030712 100%); 
+            border-bottom: 1px solid var(--border-color);
+            display: flex; 
+            align-items: center; 
+            gap: 14px; 
+        }
+        .brand-logo-glow {
+            width: 42px; height: 42px; background: var(--brand-primary); border-radius: var(--radius-md);
+            display: flex; align-items: center; justify-content: center; color: white;
+            box-shadow: 0 0 15px var(--brand-glow);
+        }
+        .brand-text h2 { font-size: 1.15rem; font-weight: 800; letter-spacing: 0.5px; color: var(--text-pure); }
+        .brand-status { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 0.65rem; color: var(--accent-success); text-transform: uppercase; margin-top: 2px; font-weight: 700; }
+        .status-dot { width: 6px; height: 6px; background: var(--accent-success); border-radius: 50%; box-shadow: 0 0 8px var(--accent-success); animation: pulse 1.8s infinite; }
+
+        /* Contenido Scroleable de Formularios */
+        .sidebar-scrollable-content { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+        
+        /* Contenedores Modulares Desplegables */
+        .section-panel { 
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            transition: var(--transition-smooth);
+        }
+        .section-panel:hover { border-color: rgba(255, 255, 255, 0.12); box-shadow: inset 0 0 12px rgba(255,255,255,0.01); }
+        
+        .section-title { 
+            font-family: var(--font-mono);
+            font-size: 0.75rem; 
+            font-weight: 700; 
+            color: var(--text-muted); 
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px; 
+            letter-spacing: 0.5px; 
+        }
+        .section-title span { color: var(--brand-primary); }
+
+        .form-group { margin-bottom: 12px; }
+        .form-group:last-child { margin-bottom: 0; }
+        .form-group label { display: block; font-size: 0.75rem; font-weight: 600; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.3px; }
+
+        /* Inputs y Selects Estilizados */
+        .form-control { 
+            width: 100%; 
+            padding: 10px 14px; 
+            border: 1px solid var(--border-color); 
+            border-radius: var(--radius-sm); 
+            font-size: 0.85rem; 
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            outline: none;
+            transition: var(--transition-smooth);
+            cursor: pointer;
+        }
+        .form-control:focus { border-color: var(--brand-primary); box-shadow: 0 0 0 3px var(--brand-glow); }
+        .row-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+        /* Panel de Descarga de Datos de Nivel Científico */
+        .container-descargas { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .btn-download { 
+            padding: 10px; font-family: var(--font-mono); font-size: 0.75rem; font-weight: 600;
+            border: 1px solid var(--border-color); background: var(--bg-main); color: var(--text-primary);
+            border-radius: var(--radius-sm); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: var(--transition-smooth);
+        }
+        .btn-download:hover { background: var(--brand-primary); border-color: var(--brand-primary); color: white; box-shadow: 0 4px 12px var(--brand-glow); }
+
+        /* Botonera Principal de Ejecución Fija */
+        .btn-container { display: grid; grid-template-columns: 1fr 1.4fr; gap: 12px; padding: 20px; background: #080c18; border-top: 1px solid var(--border-color); }
+        .btn { padding: 12px; border: none; border-radius: var(--radius-md); font-size: 0.85rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: var(--transition-smooth); text-transform: uppercase; letter-spacing: 0.5px; }
+        .btn-primary { background: var(--brand-primary); color: #fff; box-shadow: 0 4px 14px var(--brand-glow); }
+        .btn-primary:hover { background: #1d4ed8; transform: translateY(-1px); }
+        .btn-secondary { background: var(--bg-surface); color: #94a3b8; border: 1px solid var(--border-color); }
+        .btn-secondary:hover { background: var(--bg-surface-hover); color: white; }
+
+        /* Historial / Tablas de Auditoría */
+        .history-box { padding: 0 20px 20px; border-top: 1px solid var(--border-color); background: #080c18; }
+        .table-container { max-height: 140px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: var(--bg-main); }
+        .data-table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 0.65rem; text-align: left; }
+        .data-table th { position: sticky; top: 0; background: var(--bg-surface); color: #94a3b8; padding: 8px 10px; font-weight: 700; border-bottom: 1px solid var(--border-color); text-transform: uppercase; }
+        .data-table td { padding: 8px 10px; border-bottom: 1px solid var(--border-color); color: #cbd5e1; }
+        .data-table tbody tr:hover { background: rgba(255,255,255,0.02); }
 
         /*============================================================================
-          WORKSPACE DE TRES COLUMNAS (LAYOUT COMPLETO)
+          DASHBOARD VISUAL PRINCIPAL (MAPA + ANALÍTICA)
         ============================================================================*/
-        .main-workspace { flex: 1; display: grid; grid-template-columns: 340px 1fr 340px; gap: 8px; padding: 8px; overflow: hidden; height: calc(100vh - 75px); }
-        
-        /* Contenedores Genéricos de Scroll */
-        .sidebar-left, .sidebar-right { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; height: 100%; }
-        .center-workspace { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; height: 100%; }
+        #map-container { flex: 1; height: 100%; display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
 
-        /* Estilos de Paneles e Inputs */
-        .panel { background: var(--bg-panel); border: 1px solid var(--border-ui); border-radius: var(--radius-main); padding: 12px; }
-        .panel-title { font-size: 0.75rem; font-weight: 700; color: var(--text-title); border-bottom: 1px solid var(--border-ui); padding-bottom: 6px; margin-bottom: 10px; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
-        .panel-title span { color: var(--text-muted); font-family: var(--font-code); }
-        
-        .form-group { margin-bottom: 8px; }
-        .form-group label { display: block; font-size: 0.65rem; color: #94a3b8; margin-bottom: 4px; text-transform: uppercase; font-weight: 600; }
-        .form-control { width: 100%; padding: 7px 10px; background: var(--bg-input); border: 1px solid var(--border-ui); color: white; border-radius: 4px; font-size: 0.75rem; outline: none; }
-        .form-control:focus { border-color: var(--accent-blue); }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        /* Sistema Switcher Control de Pestañas */
+        .header-dashboard-controls { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .visor-tabs { display: flex; gap: 6px; background: var(--bg-sidebar); padding: 6px; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
+        .tab-btn { padding: 8px 18px; border: none; background: transparent; font-size: 0.8rem; font-weight: 700; border-radius: var(--radius-sm); cursor: pointer; color: var(--text-muted); transition: var(--transition-smooth); display: flex; align-items: center; gap: 8px; }
+        .tab-btn.active { background: var(--brand-primary); color: white; box-shadow: 0 4px 10px var(--brand-glow); }
 
-        /* Tarjeta informativa verde dentro del menú */
-        .info-alert-box { background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 4px; padding: 8px; margin-top: 8px; }
-        .info-alert-box h5 { color: var(--accent-green); font-size: 0.7rem; margin-bottom: 4px; }
-        .info-alert-box p { font-size: 0.65rem; color: #a7f3d0; line-height: 1.3; }
+        .tab-content { display: none; flex: 1; position: relative; width: 100%; height: 100%; overflow: hidden; }
+        .tab-content.active { display: block; }
+
+        /* Capa del Mapa Leaflet */
+        #map { width: 100%; height: 100%; border-radius: var(--radius-lg); border: 1px solid var(--border-color); background: #020617; }
+
+        /* Overlays y HUD Flotantes sobre el Mapa */
+        .info-overlay { 
+            position: absolute; top: 16px; left: 16px; background: rgba(11, 15, 31, 0.9); 
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 16px; 
+            border-radius: var(--radius-md); border: 1px solid var(--border-color); border-left: 4px solid var(--accent-success); 
+            z-index: 1000; min-width: 280px; box-shadow: var(--shadow-subtle); 
+        }
+        .info-overlay h4 { font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent-success); margin-bottom: 8px; font-weight: 700; letter-spacing: 0.5px; }
+        .info-overlay p { font-size: 0.75rem; display: flex; justify-content: space-between; margin-top: 5px; color: #94a3b8; }
+        .info-overlay p span { color: white; font-weight: 600; font-family: var(--font-mono); }
+
+        /* Leyenda de Colores Dinámica Inteligente */
+        .legend-overlay {
+            position: absolute; bottom: 24px; right: 16px; background: rgba(11, 15, 31, 0.9);
+            backdrop-filter: blur(12px); padding: 14px; border-radius: var(--radius-md);
+            border: 1px solid var(--border-color); z-index: 1000; min-width: 200px; box-shadow: var(--shadow-subtle);
+        }
+        .legend-title { font-family: var(--font-mono); font-size: 0.7rem; color: #94a3b8; margin-bottom: 8px; font-weight: 700; text-transform: uppercase; }
+        .legend-scale { display: flex; flex-direction: column; gap: 6px; }
+        .legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.7rem; color: #cbd5e1; }
+        .legend-color { width: 24px; height: 12px; border-radius: 3px; border: 1px solid rgba(255,255,255,0.1); }
+
+        /* Herramientas de Esquina */
+        .toolbar-right { position: absolute; top: 16px; right: 16px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; }
+        .toolbar-btn { 
+            width: 38px; height: 38px; background: var(--bg-sidebar); border: 1px solid var(--border-color); 
+            border-radius: var(--radius-md); cursor: pointer; display: flex; align-items: center; justify-content: center; 
+            font-size: 1.1rem; color: white; transition: var(--transition-smooth); box-shadow: var(--shadow-subtle);
+        }
+        .toolbar-btn:hover { background: var(--brand-primary); border-color: var(--brand-primary); transform: scale(1.05); }
+
+        /* Grid del Módulo Estadístico Avanzado */
+        .charts-dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; height: 100%; }
+        .chart-card { 
+            background: var(--bg-sidebar); padding: 20px; border-radius: var(--radius-lg); 
+            border: 1px solid var(--border-color); display: flex; flex-direction: column; height: 100%; overflow: hidden;
+        }
+        .chart-card h3 { 
+            font-family: var(--font-mono); font-size: 0.8rem; margin-bottom: 16px; color: var(--text-pure); 
+            text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; display: flex; align-items: center; gap: 8px;
+        }
+        .chart-card h3::before { content: ''; width: 4px; height: 12px; background: var(--brand-primary); display: inline-block; border-radius: 2px; }
+        .chart-wrapper { flex: 1; width: 100%; height: calc(100% - 40px); position: relative; }
 
         /*============================================================================
-          2. COLUMNA CENTRAL: MAPA CON SELECTOR MULTI-PESTAÑA
+          DASHBOARD DE KPI / MÉTRICAS DE EXTENSIÓN INFERIOR
         ============================================================================*/
-        .map-wrapper-card { flex: 1; min-height: 420px; position: relative; display: flex; flex-direction: column; background: var(--bg-panel); border: 1px solid var(--border-ui); border-radius: var(--radius-main); overflow: hidden; }
+        .dashboard-results { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; min-height: 90px; }
+        .result-card { 
+            background: var(--bg-sidebar); padding: 16px; border-radius: var(--radius-lg); 
+            border: 1px solid var(--border-color); border-left: 4px solid var(--brand-primary);
+            display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden;
+        }
+        .result-card::after { content: ''; position: absolute; top: 0; right: 0; width: 40px; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.01)); pointer-events: none; }
+        .result-card p { font-family: var(--font-mono); font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .result-card h1 { font-family: var(--font-mono); font-size: 1.35rem; color: var(--text-pure); font-weight: 700; margin-top: 4px; letter-spacing: -0.5px; }
         
-        /* Tabs del Mapa Superior */
-        .map-tabs-header { background: #0e121f; padding: 6px 12px; border-bottom: 1px solid var(--border-ui); display: flex; justify-content: space-between; align-items: center; }
-        .tabs-cluster { display: flex; gap: 4px; }
-        .map-tab { padding: 4px 12px; background: transparent; border: none; color: var(--text-muted); font-size: 0.7rem; font-weight: 600; cursor: pointer; border-radius: 3px; }
-        .map-tab.active { background: var(--accent-blue); color: white; }
-        
-        .sub-map-controls { display: flex; gap: 4px; margin-top: 4px; padding: 0 12px 6px; background: #0e121f; }
-        .sub-btn { padding: 3px 8px; font-size: 0.65rem; background: var(--bg-subpanel); border: 1px solid var(--border-ui); color: white; cursor: pointer; border-radius: 3px; }
-        .sub-btn.active { background: #334155; }
+        .result-card:nth-child(2) { border-left-color: var(--accent-success); }
+        .result-card:nth-child(2) h1 { color: var(--accent-success); }
+        .result-card:nth-child(3) { border-left-color: var(--accent-warning); }
+        .result-card:nth-child(3) h1 { color: var(--accent-warning); }
+        .result-card:nth-child(4) { border-left-color: var(--accent-danger); }
+        .result-card:nth-child(4) h1 { color: var(--accent-danger); }
 
-        #map { flex: 1; width: 100%; background: #020617; }
+        /* SCROLLBAR MODERNO PERSONALIZADO */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
 
-        /* HUD Telemetría flotante sobre el mapa */
-        .hud-overlay { position: absolute; top: 80px; left: 12px; background: rgba(17, 22, 37, 0.9); backdrop-filter: blur(8px); border: 1px solid var(--border-ui); border-left: 3px solid var(--accent-green); padding: 10px; border-radius: 4px; z-index: 1000; min-width: 220px; }
-        .hud-overlay h4 { font-family: var(--font-code); font-size: 0.7rem; color: var(--accent-green); margin-bottom: 6px; }
-        .hud-row { display: flex; justify-content: space-between; font-size: 0.65rem; margin-bottom: 3px; }
-        .hud-row span:last-child { font-family: var(--font-code); color: white; font-weight: 600; }
-
-        /* Leyenda Estilo Referencia */
-        .legend-panel { position: absolute; bottom: 12px; right: 12px; background: rgba(17, 22, 37, 0.95); border: 1px solid var(--border-ui); padding: 10px; border-radius: 4px; z-index: 1000; width: 160px; }
-        .legend-panel h5 { font-size: 0.65rem; color: white; margin-bottom: 6px; text-transform: uppercase; }
-        .legend-bar-item { display: flex; align-items: center; gap: 8px; font-size: 0.6rem; margin-bottom: 4px; }
-        .color-box { width: 16px; height: 10px; border-radius: 2px; }
-
-        /* Toolbar del Mapa */
-        .map-tools { position: absolute; top: 80px; right: 12px; z-index: 1000; display: flex; flex-direction: column; gap: 4px; }
-        .tool-btn { width: 28px; height: 28px; background: var(--bg-panel); border: 1px solid var(--border-ui); color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; border-radius: 4px; }
-
-        /*============================================================================
-          3. COLUMNA CENTRAL INFERIOR: DASHBOARD DE ANALÍTICA AVANZADA
-        ============================================================================*/
-        /* Fila de Tarjetas KPI Rápidas */
-        .metrics-bar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-        .kpi-card { background: var(--bg-panel); border: 1px solid var(--border-ui); padding: 8px; border-radius: var(--radius-main); text-align: center; }
-        .kpi-card p { font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
-        .kpi-card h2 { font-family: var(--font-code); font-size: 1rem; color: white; margin-top: 2px; }
-
-        /* Grid Multianalítico de Gráficos de la Imagen de Destino */
-        .analytics-charts-matrix { display: grid; grid-template-columns: 1.2fr 1.5fr 1fr 1.3fr; gap: 6px; }
-        .chart-box { background: var(--bg-panel); border: 1px solid var(--border-ui); border-radius: var(--radius-main); padding: 10px; height: 180px; display: flex; flex-direction: column; }
-        .chart-box h4 { font-size: 0.65rem; color: var(--text-title); text-transform: uppercase; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.04); }
-        .chart-container-canvas { flex: 1; width: 100%; height: 100%; position: relative; }
-
-        /* Gráfico de Tendencias e Historial Multianual de Ancho Completo */
-        .trends-matrix-row { display: grid; grid-template-columns: 2fr 1.5fr; gap: 6px; }
-
-        /* Estilo para las minitablas descriptivas de datos */
-        .table-desc-clean { width: 100%; border-collapse: collapse; font-family: var(--font-code); font-size: 0.6rem; color: #94a3b8; }
-        .table-desc-clean td { padding: 3px 2px; border-bottom: 1px solid rgba(255,255,255,0.02); }
-        .table-desc-clean td:last-child { text-align: right; color: white; font-weight: bold; }
-
-        /*============================================================================
-          4. COLUMNA DERECHA: CALIDAD DE ESCENAS Y METADATOS EXTENDIDOS
-        ============================================================================*/
-        .quality-metric-badge { display: flex; justify-content: space-between; align-items: center; padding: 8px; background: var(--bg-subpanel); border-radius: 4px; border-left: 3px solid var(--accent-blue); }
-        .stars { color: var(--accent-orange); letter-spacing: 1px; }
-
-        .scenes-log-list { max-height: 180px; overflow-y: auto; border: 1px solid var(--border-ui); border-radius: 4px; font-family: var(--font-code); font-size: 0.6rem; }
-        .scene-item { padding: 6px; border-bottom: 1px solid rgba(255,255,255,0.03); display: flex; justify-content: space-between; }
-        .scene-item:hover { background: rgba(255,255,255,0.02); }
-        .scene-percentage { color: var(--accent-blue); font-weight: bold; }
-
-        /* Consola Inferior / Historial General */
-        .history-table-wrapper { max-height: 110px; overflow-y: auto; }
-        .clean-data-table { width: 100%; border-collapse: collapse; font-size: 0.6rem; font-family: var(--font-code); }
-        .clean-data-table th { background: #1a2236; color: #94a3b8; padding: 6px; text-align: left; position: sticky; top: 0; }
-        .clean-data-table td { padding: 5px 6px; border-bottom: 1px solid rgba(255,255,255,0.04); }
-
-        /* Pipeline de descargas rápidas */
-        .export-buttons-flex { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; }
-        .btn-exp { padding: 8px; background: var(--bg-subpanel); border: 1px solid var(--border-ui); color: white; border-radius: 4px; font-size: 0.65rem; font-weight: bold; cursor: pointer; text-align: center; }
-        .btn-exp:hover { background: var(--accent-blue); }
-
-        .btn-action-trigger { width: 100%; padding: 10px; background: var(--accent-blue); color: white; border: none; border-radius: 4px; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; }
-        .btn-action-trigger:hover { background: #1d4ed8; }
-
-        /*============================================================================
-          5. FOOTER INFERIOR CORPORATIVO
-        ============================================================================*/
-        footer { height: 25px; background: #090c15; border-top: 1px solid var(--border-ui); display: flex; align-items: center; justify-content: space-between; padding: 0 12px; font-size: 0.65rem; color: var(--text-muted); }
-
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+        /* ANIMACIONES CORE CSS */
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes spin-reverse { 0% { transform: rotate(360deg); } 100% { transform: rotate(0deg); } }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); } 70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
     </style>
 </head>
 <body>
 
-    <!-- 1. HEADER CORPORATIVO SUPERIOR -->
-    <header>
-        <div class="header-brand">
-            <div class="logo"></div>
-            <h1>GEOVISOR PERÚ</h1>
-            <span>| Plataforma de Análisis Geospatial v3.0</span>
+    <!-- HUD Capa del Loader de Control Científico -->
+    <div id="loader">
+        <div class="spinner-container">
+            <div class="spinner-outer"></div>
+            <div class="spinner-inner"></div>
         </div>
-        <nav class="header-nav">
-            <a href="#" class="nav-link"><span style="font-size:0.9rem;">🏠</span> Inicio</a>
-            <a href="#" class="nav-link active"><span style="font-size:0.9rem;">🗺️</span> Mapa</a>
-            <a href="#" class="nav-link"><span style="font-size:0.9rem;">📊</span> Análisis</a>
-            <a href="#" class="nav-link"><span style="font-size:0.9rem;">📋</span> Reportes</a>
-            <a href="#" class="nav-link"><span style="font-size:0.9rem;">📥</span> Descargas</a>
-        </nav>
-        <div class="header-user">
-            <div class="user-info">
-                <span class="name">Alessandro Ahualla</span>
-                <span class="role">Investigador Principal</span>
-            </div>
-            <div class="user-avatar"></div>
-        </div>
-    </header>
+        <p>Iniciando Motor Earth Engine v3.0...</p>
+    </div>
 
-    <!-- WORKSPACE TOTAL EN TRES COLUMNAS -->
-    <div class="main-workspace">
-        
-        <!-- =========================================================================
-             COLUMNA IZQUIERDA: PARAMETRIZACIÓN SENSOR/OBJETIVO
-        ========================================================================== -->
-        <div class="sidebar-left">
-            
-            <div class="panel">
-                <div class="panel-title"><span>1.</span> Configuración de Análisis</div>
+    <!-- PANEL DE CONTROL FLOTANTE IZQUIERDO -->
+    <div id="sidebar">
+        <div class="brand-header">
+            <div class="brand-logo-glow">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                    <polyline points="2 17 12 22 22 17"></polyline>
+                    <polyline points="2 12 12 17 22 12"></polyline>
+                </svg>
+            </div>
+            <div class="brand-text">
+                <h2>GEOVISOR PERÚ</h2>
+                <div class="brand-status">
+                    <div class="status-dot"></div> GEE Core Connected
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-scrollable-content">
+            <!-- 1. MODALIDAD DE ANÁLISIS (ENFOQUE) -->
+            <div class="section-panel">
+                <div class="section-title"><span>01</span> Modalidad de Enfoque</div>
                 <div class="form-group">
-                    <label>Modalidad de Análisis</label>
+                    <label for="tipoConsulta">Enfoque Político / Geográfico</label>
                     <select id="tipoConsulta" class="form-control">
-                        <option value="conservacion">Áreas Naturales y Conservación (ANPs)</option>
                         <option value="politico">División Político-Administrativa</option>
+                        <option value="conservacion">Áreas Naturales Protegidas (ANPs)</option>
                     </select>
                 </div>
             </div>
 
-            <div class="panel">
-                <div class="panel-title"><span>2.</span> Límites Cartográficos</div>
-                <div class="form-group">
-                    <label>Categoría: ACP</label>
-                    <select id="capaAmbiental" class="form-control">
-                        <option value="acp">Áreas de Conservación Privada (ACP)</option>
-                        <option value="anpdefinitivas">ANP Administración Nacional</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Área de Estudio Específica</label>
-                    <select id="nombreArea" class="form-control">
-                        <option value="bosque_canoncillo">BOSQUE NATURAL EL CAÑONCILLO</option>
-                    </select>
+            <!-- 2. LÍMITES POLÍTICOS / VECTORIALES -->
+            <div class="section-panel">
+                <div class="section-title"><span>02</span> Límites Territoriales</div>
+                
+                <!-- Grupo Político Administrativo (Por defecto) -->
+                <div id="grupoPolitico">
+                    <div class="form-group">
+                        <label for="departamento">Región / Departamento</label>
+                        <select id="departamento" class="form-control">
+                            <option value="Seleccione...">Cargando Regiones...</option>
+                        </select>
+                    </div>
+                    <div class="row-grid">
+                        <div class="form-group">
+                            <label for="provincia">Provincia</label>
+                            <select id="provincia" class="form-control">
+                                <option value="Seleccione...">Filtro Base...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="distrito">Distrito</label>
+                            <select id="distrito" class="form-control">
+                                <option value="Seleccione...">Filtro Detalle...</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="info-alert-box">
-                    <h5>ℹ️ Información del Área</h5>
-                    <p><strong>Categoría:</strong> Bosque Natural de Infiltración<br>
-                    <strong>Región/Provincia:</strong> La Libertad / Pacasmayo<br>
-                    <strong>Área Oficial:</strong> 13.01 km²</p>
+                <!-- Grupo Ambiental Alternativo -->
+                <div id="grupoAmbiental" style="display: none;">
+                    <div class="form-group">
+                        <label for="capaAmbiental">Sistemas de Conservación</label>
+                        <select id="capaAmbiental" class="form-control">
+                            <option value="Seleccione...">Seleccione Categoría...</option>
+                            <option value="anpdefinitivas">ANP Administración Nacional</option>
+                            <option value="acr">Áreas de Conservación Regional (ACR)</option>
+                            <option value="acp">Áreas de Conservación Privada (ACP)</option>
+                            <option value="zona_reservada">Zonas Reservadas</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="nombreArea">Polígono Específico</label>
+                        <select id="nombreArea" class="form-control" disabled>
+                            <option value="Seleccione...">Esperando Categoría...</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
-            <div class="panel">
-                <div class="panel-title"><span>3.</span> Parámetros de Misión</div>
+            <!-- 3. CONFIGURACIÓN DEL SENSOR SATELITAL Y OBJETIVO -->
+            <div class="section-panel">
+                <div class="section-title"><span>03</span> Parámetros del Sensor GEE</div>
                 <div class="form-group">
-                    <label>Sensor Satelital</label>
+                    <label for="satelite">Constelación Satelital</label>
                     <select id="satelite" class="form-control">
                         <option value="Landsat 5">Landsat 5 TM (1984 - 2011)</option>
-                        <option value="Landsat 8">Landsat 8 OLI</option>
-                        <option value="Sentinel 2">Sentinel 2 MSI</option>
+                        <option value="Landsat 7">Landsat 7 ETM+ (1999 - 2021)</option>
+                        <option value="Landsat 8">Landsat 8 OLI (2013 - Actualidad)</option>
+                        <option value="Landsat 9">Landsat 9 OLI-2 (2021 - Actualidad)</option>
+                        <option value="Sentinel 2">Sentinel 2 MSI (2015 - Actualidad)</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label>Objetivo del Estudio</label>
-                    <select id="objetivo" class="form-control">
-                        <option value="Vegetación">Análisis de Vegetación Avanzado</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Índice Espectral</label>
-                    <select id="indice" class="form-control">
-                        <option value="NDVI">NDVI (Índice de Vegetación Diferenciada)</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="panel">
-                <div class="panel-title"><span>4.</span> Temporalidad de Análisis</div>
-                <div class="grid-2">
+                <div class="row-grid">
                     <div class="form-group">
-                        <label>Año Inicial</label>
-                        <select id="anioInicio" class="form-control"><option>1994</option></select>
+                        <label for="objetivo">Objetivo de Estudio</label>
+                        <select id="objetivo" class="form-control">
+                            <option value="Vegetación">Foliar / Vegetación</option>
+                            <option value="Agua">Recursos Hídricos</option>
+                            <option value="Área Glacial">Zonas Criogénicas</option>
+                            <option value="Temperatura">T° Superficial (LST)</option>
+                            <option value="Suelo">Suelo / Geología</option>
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label>Año Final</label>
-                        <select id="anioFinal" class="form-control"><option>2011</option></select>
+                        <label for="indice">Índice Espectral</label>
+                        <select id="indice" class="form-control">
+                            <option value="NDVI">NDVI</option>
+                            <option value="NDWI">NDWI</option>
+                            <option value="SAVI">SAVI</option>
+                            <option value="NBR">NBR</option>
+                        </select>
                     </div>
                 </div>
             </div>
 
-            <button id="consultar" class="btn-action-trigger">Calcular Matriz GEE</button>
+            <!-- 4. CRONOLOGÍA (VENTANA TEMPORAL) -->
+            <div class="section-panel">
+                <div class="section-title"><span>04</span> Intervalo Temporal</div>
+                <div class="row-grid">
+                    <div class="form-group">
+                        <label for="anioInicio">Año Apertura</label>
+                        <select id="anioInicio" class="form-control"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="anioFinal">Año Cierre</label>
+                        <select id="anioFinal" class="form-control"></select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. PIPELINE DE EXPORTACIÓN AVANZADA -->
+            <div class="section-panel">
+                <div class="section-title"><span>05</span> Pipeline de Exportación</div>
+                <div class="container-descargas">
+                    <button id="btnTiff" class="btn-download">💾 GeoTIFF (Raster)</button>
+                    <button id="btnShp" class="btn-download">📦 ESRI Shapefile</button>
+                    <button id="btnPng" class="btn-download">📸 Render PNG</button>
+                    <button id="btnPdf" class="btn-download">📄 Reporte PDF</button>
+                </div>
+            </div>
         </div>
 
-        <!-- =========================================================================
-             COLUMNA CENTRAL: VISOR Y DASHBOARD DE MÚLTIPLES CUADROS DE GRÁFICOS
-        ========================================================================== -->
-        <div class="center-workspace">
+        <!-- ACCIONES LOGÍSTICAS CORE INFERIORES -->
+        <div class="btn-container">
+            <button id="limpiar" class="btn btn-secondary">Reset</button>
+            <button id="consultar" class="btn btn-primary">Ejecutar Script</button>
+        </div>
+
+        <!-- 6. REGISTRO LOGÍSTICO / AUDITORÍA HISTÓRICA -->
+        <div class="history-box">
+            <div class="section-title" style="margin-bottom: 8px;"><span>06</span> Consola de Operaciones</div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Ubigeo / Polígono</th>
+                            <th>Índice</th>
+                            <th>Año</th>
+                            <th>Sensor</th>
+                            <th>Área (km²)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaResultados">
+                        <!-- Carga Dinámica desde app.js -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTENEDOR DERECHO INTEGRADO -->
+    <div id="map-container">
+        
+        <!-- Tab Controls Superiores del Visor -->
+        <div class="header-dashboard-controls">
+            <div class="visor-tabs">
+                <button class="tab-btn active" onclick="switchTab('mapa')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+                    Visor de Mapa Satelital
+                </button>
+                <button class="tab-btn" onclick="switchTab('estadistica')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                    Analytics Dashboard GEE
+                </button>
+            </div>
+        </div>
+
+        <!-- PESTAÑA CENTRAL: CAPA CARTOGRÁFICA -->
+        <div id="tab-mapa" class="tab-content active">
+            <div id="map"></div>
             
-            <!-- CONTENEDOR DEL MAPA CON CONTROLADORES DE PESTAÑAS -->
-            <div class="map-wrapper-card">
-                <div class="map-tabs-header">
-                    <div class="tabs-cluster">
-                        <button class="map-tab active">Mapa</button>
-                        <button class="map-tab">Gráfico Temporal</button>
-                        <button class="map-tab">Análisis Estadístico</button>
-                        <button class="map-tab">Comparador</button>
-                        <button class="map-tab">Metadatos</button>
-                        <button class="map-tab">Reporte</button>
-                    </div>
-                </div>
-                <div class="sub-map-controls">
-                    <button class="sub-btn active">Mapa Base</button>
-                    <button class="sub-btn">Satélite GEE</button>
-                </div>
+            <!-- HUD Teatral de Capas Flotantes Activas -->
+            <div class="info-overlay">
+                <h4>Engine Telemetry Active</h4>
+                <p>Capa Activa: <span id="indiceNombre">NDVI Standard</span></p>
+                <p>Plataforma Satélite: <span id="sensor">Landsat 8 OLI</span></p>
+                <p>Filtro Temporal: <span id="anio">Mediana 2026</span></p>
+            </div>
 
-                <!-- Elemento del Mapa Físico -->
-                <div id="map"></div>
-
-                <!-- HUD Telemetría Earth Engine -->
-                <div class="hud-overlay">
-                    <h4>📡 CAPA ACTIVA - GOOGLE EARTH ENGINE</h4>
-                    <div class="hud-row"><span>Índice Espectral:</span><span>NDVI (Normalized Difference)</span></div>
-                    <div class="hud-row"><span>Sensor Core:</span><span>Landsat 5 TM</span></div>
-                    <div class="hud-row"><span>Resolución:</span><span>30 metros por píxel</span></div>
-                    <div class="hud-row"><span>Composición:</span><span>Mediana de Escenas</span></div>
-                    <div class="hud-row"><span>Corrección:</span><span>Aplicada (SR Reflectance)</span></div>
-                </div>
-
-                <!-- Leyenda de Colores de Rangos Espectrales -->
-                <div class="legend-panel">
-                    <h5>Leyenda NDVI</h5>
-                    <div class="legend-scale">
-                        <div class="legend-bar-item"><div class="color-box" style="background:#006100;"></div><span>Veg. Muy Alta (>0.6)</span></div>
-                        <div class="legend-bar-item"><div class="color-box" style="background:#4caf50;"></div><span>Veg. Moderada (0.4)</span></div>
-                        <div class="legend-bar-item"><div class="color-box" style="background:#ffeb3b;"></div><span>Suelo Desnudo (0.1)</span></div>
-                        <div class="legend-bar-item"><div class="color-box" style="background:#e60000;"></div><span>Agua / Nubes (<0.0)</span></div>
-                    </div>
-                </div>
-
-                <!-- Caja de Herramientas Flotante -->
-                <div class="map-tools">
-                    <button class="tool-btn">➕</button>
-                    <button class="tool-btn">➖</button>
-                    <button class="tool-btn">🗺️</button>
-                    <button class="tool-btn">📐</button>
+            <!-- Leyenda Modular Dinámica -->
+            <div class="legend-overlay" id="mapLegend">
+                <div class="legend-title">Rango de Valores Espectrales</div>
+                <div class="legend-scale">
+                    <div class="legend-item"><div class="legend-color" style="background: #006100;"></div> Alta Vitalidad / Agua (> 0.6)</div>
+                    <div class="legend-item"><div class="legend-color" style="background: #7aab00;"></div> Cobertura Media (0.3 - 0.6)</div>
+                    <div class="legend-item"><div class="legend-color" style="background: #dfef00;"></div> Suelo de Transición (0.1 - 0.3)</div>
+                    <div class="legend-item"><div class="legend-color" style="background: #e60000;"></div> Cuerpos de Agua / Urbano (< 0.1)</div>
                 </div>
             </div>
 
-            <!-- TARJETAS HORIZONTALES DE MÉTRICAS KPI -->
-            <div class="metrics-bar">
-                <div class="kpi-card"><p>Área Estudio</p><h2 id="resArea">13.01 km²</h2></div>
-                <div class="kpi-card"><p>Valor Promedio</p><h2 id="resProm" style="color:var(--accent-green);">0.064</h2></div>
-                <div class="kpi-card"><p>Valor Mediana</p><h2 id="resMediana">0.071</h2></div>
-                <div class="kpi-card"><p>Desv. Estándar</p><h2 id="resDesv">0.043</h2></div>
-                <div class="kpi-card"><p>Valor Mínimo</p><h2 id="resMin" style="color:var(--accent-red);">-0.025</h2></div>
-                <div class="kpi-card"><p>Valor Máximo</p><h2 id="resMax" style="color:var(--accent-orange);">0.294</h2></div>
-                <div class="kpi-card"><p>Píxeles Totales</p><h2>16,678</h2></div>
+            <!-- Menú Rápido Flotante -->
+            <div class="toolbar-right">
+                <button class="toolbar-btn" title="Alternar Mapa Base">🛰️</button>
+                <button class="toolbar-btn" title="Calibrar Escala">📐</button>
+                <button class="toolbar-btn" title="Pantalla Táctica Completa">📺</button>
             </div>
+        </div>
 
-            <!-- FILA 1 DE GRÁFICOS: DONA, HISTOGRAMA, BOXPLOT Y TABLA DESCRIPTIVA -->
-            <div class="analytics-charts-matrix">
-                <div class="chart-box">
-                    <h4>Distribución de Clases NDVI</h4>
-                    <div class="chart-container-canvas">
-                        <canvas id="chartClases"></canvas>
-                    </div>
-                </div>
-                <div class="chart-box">
-                    <h4>Histograma NDVI</h4>
-                    <div class="chart-container-canvas">
+        <!-- PESTAÑA COMPLEMENTARIA: MATRIZ DE CUADROS ESTADÍSTICOS -->
+        <div id="tab-estadistica" class="tab-content">
+            <div class="charts-dashboard-grid">
+                <div class="chart-card">
+                    <h3>Curva de Histograma de Frecuencia de Pixeles</h3>
+                    <div class="chart-wrapper">
                         <canvas id="chartHistograma"></canvas>
                     </div>
                 </div>
-                <div class="chart-box">
-                    <h4>Boxplot NDVI</h4>
-                    <div class="chart-container-canvas">
-                        <canvas id="chartBoxplot"></canvas>
+                <div class="chart-card">
+                    <h3>Análisis Temporal Multianual Tendencial</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="chartClases"></canvas>
                     </div>
                 </div>
-                <div class="chart-box">
-                    <h4>Estadísticas Descriptivas</h4>
-                    <table class="table-desc-clean">
-                        <tr><td>Media</td><td>0.064</td></tr>
-                        <tr><td>Mediana</td><td>0.071</td></tr>
-                        <tr><td>Desviación Estándar</td><td>0.043</td></tr>
-                        <tr><td>Varianza</td><td>0.0019</td></tr>
-                        <tr><td>Mínimo</td><td>-0.025</td></tr>
-                        <tr><td>Máximo</td><td>0.294</td></tr>
-                        <tr><td>Rango Semivarianza</td><td>0.319</td></tr>
-                        <tr><td>Cuartil Q1 (25%)</td><td>0.031</td></tr>
-                        <tr><td>Cuartil Q3 (75%)</td><td>0.091</td></tr>
-                    </table>
-                </div>
             </div>
-
-            <!-- FILA 2 DE GRÁFICOS: TENDENCIA TEMPORAL Y MATRIZ MULTIANUAL -->
-            <div class="trends-matrix-row">
-                <div class="chart-box" style="height:140px;">
-                    <h4>Gráfico Temporal de Tendencias Lineales (1994 - 2011)</h4>
-                    <div class="chart-container-canvas">
-                        <canvas id="chartTendencias"></canvas>
-                    </div>
-                </div>
-                <div class="chart-box" style="height:140px;">
-                    <h4>Resumen Temporal Organizado</h4>
-                    <table class="table-desc-clean" style="font-size:0.58rem;">
-                        <thead>
-                            <tr style="color:white; border-bottom:1px solid var(--border-ui);">
-                                <th>Métrica/Año</th><th>1994</th><th>1999</th><th>2005</th><th>2011</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>NDVI Promedio</td><td>0.047</td><td>0.055</td><td>0.063</td><td>0.071</td></tr>
-                            <tr><td>Desv. Estándar</td><td>0.051</td><td>0.045</td><td>0.042</td><td>0.039</td></tr>
-                            <tr><td>Imágenes GEE</td><td>6 escs.</td><td>8 escs.</td><td>5 escs.</td><td>9 escs.</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
         </div>
 
-        <!-- =========================================================================
-             COLUMNA DERECHA: TELEMETRÍA DE ESCENAS Y CONTROL DE AUDITORÍA
-        ========================================================================== -->
-        <div class="sidebar-right">
-            
-            <div class="panel">
-                <div class="panel-title"><span>5.</span> Calidad del Análisis</div>
-                <div class="quality-metric-badge">
-                    <div>
-                        <p style="font-size:0.6rem; color:var(--text-muted);">COBERTURA NUBOSA PROM.</p>
-                        <h3 style="color:white; font-family:var(--font-code);">8.7 %</h3>
-                    </div>
-                    <div class="stars">⭐⭐⭐⭐⭐</div>
-                </div>
-                <div style="margin-top:6px; font-size:0.65rem; color:var(--accent-green); font-weight:bold; text-align:center;">
-                    ANÁLISIS DE CALIDAD EXCELENTE
-                </div>
+        <!-- ZONA DE CONTENEDORES KPI INFERIORES DE ALTO NIVEL -->
+        <div class="dashboard-results">
+            <div class="result-card">
+                <p>Área Polígono Analizado</p>
+                <h1 id="resArea">--.--- km²</h1>
             </div>
-
-            <div class="panel">
-                <div class="panel-title"><span>6.</span> Escenas Satelitales Utilizadas</div>
-                <div class="scenes-log-list">
-                    <div class="scene-item"><span>LT05_L1TP_006037_19940211</span><span class="scene-percentage">5.2%</span></div>
-                    <div class="scene-item"><span>LT05_L1TP_006037_19980115</span><span class="scene-percentage">5.2%</span></div>
-                    <div class="scene-item"><span>LT05_L1TP_006037_20010412</span><span class="scene-percentage">8.1%</span></div>
-                    <div class="scene-item"><span>LT05_L1TP_006037_20040518</span><span class="scene-percentage">7.4%</span></div>
-                    <div class="scene-item"><span>LT05_L1TP_006037_20080822</span><span class="scene-percentage">6.3%</span></div>
-                    <div class="scene-item"><span>LT05_L1TP_006037_20111105</span><span class="scene-percentage">9.1%</span></div>
-                </div>
+            <div class="result-card">
+                <p>Media Espectral (Mean)</p>
+                <h1 id="resProm">-,---</h1>
             </div>
-
-            <div class="panel">
-                <div class="panel-title"><span>7.</span> Exportación Científica</div>
-                <div class="export-buttons-flex">
-                    <button class="btn-exp">💾 GeoTIFF</button>
-                    <button class="btn-exp">📦 SHP (ZIP)</button>
-                    <button class="btn-exp">📸 PNG Spatial</button>
-                    <button class="btn-exp">📄 PDF Report</button>
-                </div>
+            <div class="result-card">
+                <p>Cresta Máxima Registrada</p>
+                <h1 id="resMax">-,---</h1>
             </div>
-
-            <div class="panel" style="flex:1; min-height:120px; display:flex; flex-direction:column;">
-                <div class="panel-title"><span>8.</span> Historial de Consultas Realizadas</div>
-                <div class="history-table-wrapper">
-                    <table class="clean-data-table">
-                        <thead>
-                            <tr><th>Fecha</th><th>Área</th><th>Índice</th><th>Periodo</th></tr>
-                        </thead>
-                        <tbody id="tablaResultados">
-                            <tr><td>18/07/26</td><td>Cañoncillo</td><td>NDVI</td><td>1994-2011</td></tr>
-                            <tr><td>17/07/26</td><td>Huascarán</td><td>NDWI</td><td>2020-2026</td></tr>
-                            <tr><td>15/07/26</td><td>Pacaya S.</td><td>EVI</td><td>2015-2022</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+            <div class="result-card">
+                <p>Límite Mínimo Obtenido</p>
+                <h1 id="resMin">-,---</h1>
             </div>
-
         </div>
-
     </div>
 
-    <!-- 5. FOOTER DE LA PLATAFORMA -->
-    <footer>
-        <div>GEOVISOR PERÚ v3.0 | Plataforma de Investigación Geospatial Avanzada</div>
-        <div>Datos Core: Google Earth Engine | Landsat 5 TM | WGS84 - EPSG:4326</div>
-        <div>Desarrollado por Alessandro Ahualla Molina</div>
-    </footer>
-
-    <!-- Dependencias de Scripts JavaScript Externos -->
+    <!-- CARGA DE DEPENDENCIAS CORE EXTERNAs -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <script src="js/ubigeo.js"></script>
     <script src="js/app.js"></script>
+    
+    <!-- Script de Control Táctico de Interfaz -->
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById('tab-' + tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+            
+            if(tabId === 'mapa') {
+                setTimeout(() => { if (typeof map !== 'undefined') map.invalidateSize(); }, 250);
+            }
+        }
+        // Desvanecimiento del Loader una vez cargado el DOM
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const loader = document.getElementById('loader');
+                if(loader) loader.style.opacity = '0';
+                setTimeout(() => loader.remove(), 400);
+            }, 1200);
+        });
+    </script>
 </body>
 </html>
