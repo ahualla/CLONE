@@ -3,662 +3,394 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GEOVISOR PERÚ PRO v3.0 - Advanced Geospatial Analytics Platform</title>
-    
-    <!-- Hojas de Estilo - Core e Iconografía -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap">
-    
+    <title>GEOVISOR PERÚ - Plataforma de Análisis Geospatial</title>
+    <!-- Cargar Chart.js para los gráficos interactivos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* SISTEMA DE DISEÑO AVANZADO - VARIABLES DE ENTORNO (CSS MODERN) */
         :root {
-            --bg-main: #060814;
-            --bg-sidebar: #0b0f1f;
-            --bg-surface: #12182d;
-            --bg-surface-hover: #1b233d;
-            --border-color: rgba(255, 255, 255, 0.07);
-            --border-color-active: rgba(59, 130, 246, 0.4);
-            
-            --text-pure: #ffffff;
-            --text-primary: #f1f5f9;
-            --text-muted: #64748b;
-            --text-glow: #3b82f6;
-
-            --brand-primary: #2563eb;
-            --brand-glow: rgba(37, 99, 235, 0.35);
-            --accent-success: #10b981;
-            --accent-warning: #f59e0b;
-            --accent-danger: #ef4444;
-            --accent-purple: #8b5cf6;
-
-            --font-sans: 'Plus Jakarta Sans', sans-serif;
-            --font-mono: 'JetBrains Mono', monospace;
-            --shadow-subtle: 0 4px 20px rgba(0, 0, 0, 0.4);
-            --radius-lg: 16px;
-            --radius-md: 10px;
-            --radius-sm: 6px;
-            --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --bg-main: #f4f6f9;
+            --bg-card: #ffffff;
+            --text-dark: #333333;
+            --text-muted: #666666;
+            --border-color: #e0e0e0;
+            --primary-blue: #0f52ba;
+            --success-green: #2ecc71;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
-        body { background-color: var(--bg-main); color: var(--text-primary); display: flex; width: 100vw; height: 100vh; overflow: hidden; padding: 12px; gap: 12px; }
-
-        /* INTERFAZ DEL SKELETON LOADER */
-        #loader { position: fixed; inset: 0; background: var(--bg-main); z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 16px; transition: opacity 0.4s ease; pointer-events: none; }
-        .spinner-container { position: relative; width: 64px; height: 64px; }
-        .spinner-outer { width: 100%; height: 100%; border: 3px solid transparent; border-top-color: var(--brand-primary); border-radius: 50%; animation: spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite; }
-        .spinner-inner { position: absolute; inset: 8px; border: 3px solid transparent; border-bottom-color: var(--accent-success); border-radius: 50%; animation: spin-reverse 0.9s linear infinite; }
-        #loader p { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
-
-        /* SIDEBAR ESTRUCTURAL TÁCTICO IZQUIERDO */
-        #sidebar { 
-            width: 410px; 
-            min-width: 410px;
-            height: 100%;
-            background: var(--bg-sidebar); 
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-subtle);
-            display: flex; 
-            flex-direction: column; 
-            z-index: 100; 
-            overflow: hidden;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .brand-header { 
-            padding: 20px; 
-            background: linear-gradient(135deg, #111827 0%, #030712 100%); 
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            font-size: 13px;
+        }
+
+        /* --- HEADER --- */
+        header {
+            background-color: var(--bg-card);
             border-bottom: 1px solid var(--border-color);
-            display: flex; 
-            align-items: center; 
-            gap: 14px; 
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .brand-logo-glow {
-            width: 42px; height: 42px; background: var(--brand-primary); border-radius: var(--radius-md);
-            display: flex; align-items: center; justify-content: center; color: white;
-            box-shadow: 0 0 15px var(--brand-glow);
-        }
-        .brand-text h2 { font-size: 1.15rem; font-weight: 800; letter-spacing: 0.5px; color: var(--text-pure); }
-        .brand-status { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 0.65rem; color: var(--accent-success); text-transform: uppercase; margin-top: 2px; font-weight: 700; }
-        .status-dot { width: 6px; height: 6px; background: var(--accent-success); border-radius: 50%; box-shadow: 0 0 8px var(--accent-success); animation: pulse 1.8s infinite; }
+        .logo-area { display: flex; align-items: center; gap: 10px; }
+        .logo-title { font-weight: bold; font-size: 18px; color: #111; }
+        .nav-links { display: flex; gap: 15px; list-style: none; }
+        .nav-links a { text-decoration: none; color: var(--text-muted); font-weight: 500; }
+        .nav-links a.active { color: var(--primary-blue); border-bottom: 2px solid var(--primary-blue); }
+        .user-profile { display: flex; align-items: center; gap: 8px; }
+        .user-avatar { width: 32px; height: 32px; background: #ccc; border-radius: 50%; }
 
-        .sidebar-scrollable-content { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
-        
-        .section-panel { 
-            background: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 16px;
-            transition: var(--transition-smooth);
+        /* --- MAIN LAYOUT --- */
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
+            gap: 15px;
+            padding: 15px;
+            height: calc(100vh - 100px);
+            overflow-y: auto;
         }
-        .section-panel:hover { border-color: rgba(255, 255, 255, 0.12); box-shadow: inset 0 0 12px rgba(255,255,255,0.01); }
-        
-        .section-title { 
-            font-family: var(--font-mono);
-            font-size: 0.75rem; 
-            font-weight: 700; 
-            color: var(--text-muted); 
+
+        /* Paneles genéricos */
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .panel-title {
+            font-size: 13px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 5px;
+            margin-bottom: 5px;
+            color: #222;
+        }
+
+        /* Form Controls */
+        .section-num { color: #555; font-weight: bold; margin-top: 5px; }
+        select, input {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            margin-top: 3px;
+            background: #fafafa;
+        }
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-primary { background-color: var(--primary-blue); color: white; }
+        .btn-secondary { background-color: #e0e0e0; color: #333; }
+
+        /* --- COLUMNA CENTRAL --- */
+        .center-column {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .map-container {
+            height: 400px;
+            background: #e5e3df; /* Representación del mapa */
+            position: relative;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 14px; 
-            letter-spacing: 0.5px; 
+            justify-content: center;
         }
-        .section-title span { color: var(--brand-primary); }
-
-        .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; font-size: 0.75rem; font-weight: 600; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.3px; }
-
-        .form-control { 
-            width: 100%; 
-            padding: 10px 14px; 
-            border: 1px solid var(--border-color); 
-            border-radius: var(--radius-sm); 
-            font-size: 0.85rem; 
-            background-color: var(--bg-main);
-            color: var(--text-primary);
-            outline: none;
-            transition: var(--transition-smooth);
-        }
-        .form-control:focus { border-color: var(--brand-primary); box-shadow: 0 0 0 3px var(--brand-glow); }
-        .form-control:disabled { background-color: #0c1020; color: var(--text-muted); cursor: not-allowed; }
-        .row-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-        .container-descargas { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-        .btn-download { 
-            padding: 10px; font-family: var(--font-mono); font-size: 0.75rem; font-weight: 600;
-            border: 1px solid var(--border-color); background: var(--bg-main); color: var(--text-primary);
-            border-radius: var(--radius-sm); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: var(--transition-smooth);
-        }
-        .btn-download:hover { background: var(--brand-primary); border-color: var(--brand-primary); color: white; box-shadow: 0 4px 12px var(--brand-glow); }
-
-        .btn-container { display: grid; grid-template-columns: 1fr 1.4fr; gap: 12px; padding: 20px; background: #080c18; border-top: 1px solid var(--border-color); }
-        .btn { padding: 12px; border: none; border-radius: var(--radius-md); font-size: 0.85rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: var(--transition-smooth); text-transform: uppercase; letter-spacing: 0.5px; }
-        .btn-primary { background: var(--brand-primary); color: #fff; box-shadow: 0 4px 14px var(--brand-glow); }
-        .btn-primary:hover { background: #1d4ed8; transform: translateY(-1px); }
-        .btn-secondary { background: var(--bg-surface); color: #94a3b8; border: 1px solid var(--border-color); }
-        .btn-secondary:hover { background: var(--bg-surface-hover); color: white; }
-
-        .history-box { padding: 0 20px 20px; border-top: 1px solid var(--border-color); background: #080c18; }
-        .table-container { max-height: 140px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: var(--bg-main); }
-        .data-table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 0.65rem; text-align: left; }
-        .data-table th { position: sticky; top: 0; background: var(--bg-surface); color: #94a3b8; padding: 8px 10px; font-weight: 700; border-bottom: 1px solid var(--border-color); text-transform: uppercase; }
-        .data-table td { padding: 8px 10px; border-bottom: 1px solid var(--border-color); color: #cbd5e1; }
-
-        /* DASHBOARD VISUAL PRINCIPAL (MAPA + ANALÍTICA) */
-        #map-container { flex: 1; height: 100%; display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
-        .header-dashboard-controls { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        .visor-tabs { display: flex; gap: 6px; background: var(--bg-sidebar); padding: 6px; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
-        .tab-btn { padding: 8px 18px; border: none; background: transparent; font-size: 0.8rem; font-weight: 700; border-radius: var(--radius-sm); cursor: pointer; color: var(--text-muted); transition: var(--transition-smooth); display: flex; align-items: center; gap: 8px; }
-        .tab-btn.active { background: var(--brand-primary); color: white; box-shadow: 0 4px 10px var(--brand-glow); }
-
-        .tab-content { display: none; width: 100%; height: 100%; position: relative; overflow: hidden; }
-        .tab-content.active { display: block; }
-
-        #map { width: 100%; height: 100%; border-radius: var(--radius-lg); border: 1px solid var(--border-color); background: #020617; }
-
-        .info-overlay { 
-            position: absolute; top: 16px; left: 16px; background: rgba(11, 15, 31, 0.9); 
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 16px; 
-            border-radius: var(--radius-md); border: 1px solid var(--border-color); border-left: 4px solid var(--accent-success); 
-            z-index: 1000; min-width: 280px; box-shadow: var(--shadow-subtle); 
-        }
-        .info-overlay h4 { font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent-success); margin-bottom: 8px; font-weight: 700; letter-spacing: 0.5px; }
-        .info-overlay p { font-size: 0.75rem; display: flex; justify-content: space-between; margin-top: 5px; color: #94a3b8; }
-        .info-overlay p span { color: white; font-weight: 600; font-family: var(--font-mono); }
-
-        .legend-overlay {
-            position: absolute; bottom: 24px; right: 16px; background: rgba(11, 15, 31, 0.9);
-            backdrop-filter: blur(12px); padding: 14px; border-radius: var(--radius-md);
-            border: 1px solid var(--border-color); z-index: 1000; min-width: 200px; box-shadow: var(--shadow-subtle);
-        }
-        .legend-title { font-family: var(--font-mono); font-size: 0.7rem; color: #94a3b8; margin-bottom: 8px; font-weight: 700; text-transform: uppercase; }
-        .legend-scale { display: flex; flex-direction: column; gap: 6px; }
-        .legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.7rem; color: #cbd5e1; }
-        .legend-color { width: 24px; height: 12px; border-radius: 3px; border: 1px solid rgba(255,255,255,0.1); }
-
-        .toolbar-right { position: absolute; top: 16px; right: 16px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; }
-        .toolbar-btn { 
-            width: 38px; height: 38px; background: var(--bg-sidebar); border: 1px solid var(--border-color); 
-            border-radius: var(--radius-md); cursor: pointer; display: flex; align-items: center; justify-content: center; 
-            font-size: 1.1rem; color: white; transition: var(--transition-smooth); box-shadow: var(--shadow-subtle);
+        .map-overlay-left {
+            position: absolute;
+            top: 10px; left: 10px;
+            background: rgba(255,255,255,0.95);
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            width: 220px;
+            font-size: 11px;
         }
 
-        .charts-dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; height: 100%; }
-        .chart-card { 
-            background: var(--bg-sidebar); padding: 20px; border-radius: var(--radius-lg); 
-            border: 1px solid var(--border-color); display: flex; flex-direction: column; height: 100%; overflow: hidden;
+        /* Fila de Métricas Rápidas */
+        .metrics-row {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
         }
-        .chart-card h3 { 
-            font-family: var(--font-mono); font-size: 0.8rem; margin-bottom: 16px; color: var(--text-pure); 
-            text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; display: flex; align-items: center; gap: 8px;
+        .metric-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 8px;
+            text-align: center;
         }
-        .chart-wrapper { flex: 1; width: 100%; height: calc(100% - 40px); position: relative; }
+        .metric-val { font-size: 16px; font-weight: bold; color: #111; margin-top: 4px; }
+        .metric-lbl { font-size: 10px; color: var(--text-muted); }
 
-        .dashboard-results { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; min-height: 90px; }
-        .result-card { 
-            background: var(--bg-sidebar); padding: 16px; border-radius: var(--radius-lg); 
-            border: 1px solid var(--border-color); border-left: 4px solid var(--brand-primary);
-            display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden;
+        /* Contenedor de gráficos */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
         }
-        .result-card p { font-family: var(--font-mono); font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-        .result-card h1 { font-family: var(--font-mono); font-size: 1.35rem; color: var(--text-pure); font-weight: 700; margin-top: 4px; }
-        
-        .result-card:nth-child(2) { border-left-color: var(--accent-success); }
-        .result-card:nth-child(2) h1 { color: var(--accent-success); }
-        .result-card:nth-child(3) { border-left-color: var(--accent-warning); }
-        .result-card:nth-child(3) h1 { color: var(--accent-warning); }
-        .result-card:nth-child(4) { border-left-color: var(--accent-danger); }
-        .result-card:nth-child(4) h1 { color: var(--accent-danger); }
+        .chart-box {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px;
+            height: 220px;
+        }
 
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        /* Tabla de historial */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            text-align: left;
+        }
+        .data-table th, .data-table td {
+            padding: 5px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .data-table th { background: #f0f0f0; }
 
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes spin-reverse { 0% { transform: rotate(360deg); } 100% { transform: rotate(0deg); } }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); } 70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+        /* --- FOOTER --- */
+        footer {
+            background: var(--bg-card);
+            border-top: 1px solid var(--border-color);
+            padding: 6px 20px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--text-muted);
+            position: fixed;
+            bottom: 0; width: 100%;
+        }
     </style>
 </head>
 <body>
 
-    <div id="loader">
-        <div class="spinner-container">
-            <div class="spinner-outer"></div>
-            <div class="spinner-inner"></div>
-        </div>
-        <p>Iniciando Motor Analítico Satelital...</p>
-    </div>
-
-    <div id="sidebar">
-        <div class="brand-header">
-            <div class="brand-logo-glow">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-                    <polyline points="2 17 12 22 22 17"></polyline>
-                </svg>
-            </div>
-            <div class="brand-text">
-                <h2>GEOVISOR PERÚ PRO</h2>
-                <div class="brand-status"><div class="status-dot"></div> GIS Backend Link Active</div>
+    <!-- HEADER -->
+    <header>
+        <div class="logo-area">
+            <div style="font-size:24px;">🌐</div>
+            <div>
+                <div class="logo-title">GEOVISOR PERÚ</div>
+                <div style="font-size:10px; color:var(--text-muted);">Plataforma de Análisis Geospatial</div>
             </div>
         </div>
-
-        <div class="sidebar-scrollable-content">
-            <!-- 1. ENFOQUE ESPACIAL -->
-            <div class="section-panel">
-                <div class="section-title"><span>01</span> Modalidad de Enfoque</div>
-                <div class="form-group">
-                    <label for="tipoConsulta">Enfoque Político / Geográfico</label>
-                    <select id="tipoConsulta" class="form-control">
-                        <option value="politico">División Político-Administrativa</option>
-                        <option value="conservacion">Áreas Naturales Protegidas (ANPs)</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- 2. LÍMITES CARTOGRÁFICOS (Estructura Código 2 adaptada) -->
-            <div class="section-panel">
-                <div class="section-title"><span>02</span> Límites Territoriales</div>
-                
-                <!-- Grupo Político Administrativo -->
-                <div id="grupoPolitico">
-                    <div class="form-group">
-                        <label for="departamento">Región / Departamento</label>
-                        <select id="departamento" class="form-control">
-                            <option value="">Seleccione Región...</option>
-                        </select>
-                    </div>
-                    <div class="row-grid">
-                        <div class="form-group">
-                            <label for="provincia">Provincia</label>
-                            <select id="provincia" class="form-control">
-                                <option value="">Seleccione...</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="distrito">Distrito</label>
-                            <select id="distrito" class="form-control">
-                                <option value="">Seleccione...</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Grupo Ambiental -->
-                <div id="grupoAmbiental" style="display: none;">
-                    <div class="form-group">
-                        <label for="capaAmbiental">Sistemas de Conservación</label>
-                        <select id="capaAmbiental" class="form-control">
-                            <option value="">Seleccione Categoría...</option>
-                            <option value="anpdefinitivas">ANP Administración Nacional</option>
-                            <option value="acr">Áreas de Conservación Regional (ACR)</option>
-                            <option value="acp">Áreas de Conservación Privada (ACP)</option>
-                            <option value="zona_reservada">Zonas Reservadas</option>
-                            <option value="zona_de_amortiguamiento">Zonas de Amortiguamiento</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="nombreArea">Polígono Específico</label>
-                        <select id="nombreArea" class="form-control" disabled>
-                            <option value="">Esperando Categoría...</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 3. PARAMETROS SENSOR -->
-            <div class="section-panel">
-                <div class="section-title"><span>03</span> Parámetros del Sensor GEE</div>
-                <div class="form-group">
-                    <label for="satelite">Constelación Satelital</label>
-                    <select id="satelite" class="form-control">
-                        <option value="Landsat 5">Landsat 5 (TM) [1984 - 2011]</option>
-                        <option value="Landsat 7">Landsat 7 (ETM+) [1999 - 2021]</option>
-                        <option value="Landsat 8">Landsat 8 (OLI) [2013 - Act]</option>
-                        <option value="Landsat 9">Landsat 9 (OLI-2) [2021 - Act]</option>
-                        <option value="Sentinel 2">Sentinel 2 (MSI) [2015 - Act]</option>
-                    </select>
-                </div>
-                <div class="row-grid">
-                    <div class="form-group">
-                        <label for="objetivo">Objetivo de Estudio</label>
-                        <select id="objetivo" class="form-control">
-                            <option value="Vegetación">Análisis de Vegetación</option>
-                            <option value="Agua">Recursos Hídricos y Humedad</option>
-                            <option value="Área Glacial">Zonas Criogénicas</option>
-                            <option value="Temperatura">Temperatura Superficial (LST)</option>
-                            <option value="Suelo">Geomorfológico / Suelo</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="indice">Índice Espectral</label>
-                        <select id="indice" class="form-control">
-                            <option value="NDVI">NDVI</option>
-                            <option value="NDWI">NDWI</option>
-                            <option value="SAVI">SAVI</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 4. TEMPORALIDAD -->
-            <div class="section-panel">
-                <div class="section-title"><span>04</span> Intervalo Temporal</div>
-                <div class="row-grid">
-                    <div class="form-group">
-                        <label for="anioInicio">Año Apertura</label>
-                        <select id="anioInicio" class="form-control"></select>
-                    </div>
-                    <div class="form-group">
-                        <label for="anioFinal">Año Cierre</label>
-                        <select id="anioFinal" class="form-control"></select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 5. EXPORTACIONES -->
-            <div class="section-panel">
-                <div class="section-title"><span>05</span> Pipeline de Exportación</div>
-                <div class="container-descargas">
-                    <button id="btnTiff" class="btn-download">💾 GeoTIFF (Raster)</button>
-                    <button id="btnShp" class="btn-download">📦 ESRI Shapefile</button>
-                    <button id="btnPng" class="btn-download">📸 Render PNG</button>
-                    <button id="btnPdf" class="btn-download">📄 Reporte PDF</button>
-                </div>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="#">Inicio</a></li>
+                <li><a href="#" class="active">Mapa</a></li>
+                <li><a href="#">Análisis</a></li>
+                <li><a href="#">Reportes</a></li>
+                <li><a href="#">Descargas</a></li>
+            </ul>
+        </nav>
+        <div class="user-profile">
+            <div class="user-avatar"></div>
+            <div>
+                <div style="font-weight:bold;">Alessandro Ahualla</div>
+                <div style="font-size:10px; color:var(--text-muted);">Investigador</div>
             </div>
         </div>
+    </header>
 
-        <div class="btn-container">
-            <button id="limpiar" class="btn btn-secondary">Limpiar</button>
-            <button id="consultar" class="btn btn-primary">Consultar</button>
-        </div>
+    <!-- DASHBOARD CONTAINER -->
+    <div class="dashboard-container">
+        
+        <!-- COLUMNA IZQUIERDA: CONFIGURACIÓN -->
+        <aside class="panel">
+            <div class="panel-title">📋 CONFIGURACIÓN DE ANÁLISIS</div>
+            
+            <div class="section-num">1. ENFOQUE DE CONSULTA</div>
+            <label>Modalidad de Análisis</label>
+            <select>
+                <option>Áreas Naturales y Conservación (AMPs)</option>
+            </select>
 
-        <!-- 6. HISTORIAL DE AUDITORIA -->
-        <div class="history-box">
-            <div class="section-title" style="margin-bottom: 8px;"><span>06</span> Consola de Operaciones</div>
-            <div class="table-container">
+            <div class="section-num">2. LÍMITES CARTOGRÁFICOS</div>
+            <label>Categoría: ACP</label>
+            <select><option>Área de Estudio Específico</option></select>
+            <select><option>BOSQUE NATURAL EL CAÑONCILLO</option></select>
+
+            <div style="background:#eef9f1; padding:8px; border-radius:4px; font-size:11px; margin-top:5px;">
+                <strong>INFORMACIÓN DEL ÁREA</strong><br>
+                Categoría: Bosque Natural D. Privada<br>
+                Ubigeo: La Libertad / Pacasmayo<br>
+                Área Oficial: 15.01 km²
+            </div>
+
+            <div class="section-num">3. PARÁMETROS DE MISIÓN</div>
+            <select><option>Landsat 5 TM (1984 - 2011)</option></select>
+            <select><option>Análisis de Vegetación</option></select>
+            <label>Índice Espectral</label>
+            <select><option>NDVI</option></select>
+
+            <div class="section-num">4. TEMPORALIDAD DE ANÁLISIS</div>
+            <div style="display:flex; gap:5px;">
+                <input type="number" value="1994" style="width:50%;">
+                <input type="number" value="2011" style="width:50%;">
+            </div>
+
+            <div class="section-num">5. EXPORTACIÓN DIGITAL</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; font-size:11px; text-align:center;">
+                <div style="border:1px solid #ccc; padding:5px; background:#fff;">GeoTIFF</div>
+                <div style="border:1px solid #ccc; padding:5px; background:#fff;">SHP (ZIP)</div>
+            </div>
+
+            <div style="display:flex; gap:5px; margin-top:10px;">
+                <button class="btn btn-primary" style="flex:1;">Consultar</button>
+                <button class="btn btn-secondary">Limpiar</button>
+            </div>
+        </aside>
+
+        <!-- COLUMNA CENTRAL: MAPA Y GRÁFICOS -->
+        <main class="center-column">
+            
+            <!-- Contenedor del Mapa simulado -->
+            <div class="map-container">
+                <div class="map-overlay-left">
+                    <strong>🟢 CAPA ACTIVA - GOOGLE EARTH ENGINE</strong><br>
+                    Índice Espectral: NDVI<br>
+                    Sensor: Landsat 5 TM<br>
+                    Resolución: 30 metros<br>
+                    Periodo: 1994 - 2011
+                </div>
+                <span style="color:#777; font-weight:bold;">[ Vista de Mapa Satelital / Leaflet o Mapbox aquí ]</span>
+            </div>
+
+            <!-- Fila de métricas calculadas -->
+            <div class="metrics-row">
+                <div class="metric-card"><div class="metric-lbl">ÁREA DE ESTUDIO</div><div class="metric-val">15.01 km²</div></div>
+                <div class="metric-card"><div class="metric-lbl">VALOR PROMEDIO</div><div class="metric-val">0.064</div></div>
+                <div class="metric-card"><div class="metric-lbl">VALOR MEDIANA</div><div class="metric-val">0.671</div></div>
+                <div class="metric-card"><div class="metric-lbl">DESV. ESTÁNDAR</div><div class="metric-val">0.033</div></div>
+                <div class="metric-card"><div class="metric-lbl">VALOR MÍNIMO</div><div class="metric-val">-0.028</div></div>
+                <div class="metric-card"><div class="metric-lbl">VALOR MÁXIMO</div><div class="metric-val">0.294</div></div>
+                <div class="metric-card"><div class="metric-lbl">FECHA DE ANÁLISIS</div><div class="metric-val" style="font-size:11px;">16/07/2026</div></div>
+            </div>
+
+            <!-- Sección de Gráficos -->
+            <div class="charts-grid">
+                <div class="chart-box">
+                    <span style="font-weight:bold; font-size:11px;">DISTRIBUCIÓN DE CLASES NDVI</span>
+                    <canvas id="pieChart" style="max-height:180px;"></canvas>
+                </div>
+                <div class="chart-box">
+                    <span style="font-weight:bold; font-size:11px;">HISTOGRAMA NDVI</span>
+                    <canvas id="barChart" style="max-height:180px;"></canvas>
+                </div>
+            </div>
+
+            <!-- Tendencia temporal inferior -->
+            <div class="chart-box" style="height:150px;">
+                <span style="font-weight:bold; font-size:11px;">GRÁFICO TEMPORAL DE TENDENCIAS</span>
+                <canvas id="lineChart" style="max-height:110px;"></canvas>
+            </div>
+
+        </main>
+
+        <!-- COLUMNA DERECHA: CALIDAD Y ESCENAS -->
+        <aside class="panel">
+            <div class="panel-title">⭐ CALIDAD DEL ANÁLISIS</div>
+            <div style="font-size:12px; display:flex; flex-direction:column; gap:5px;">
+                <div>Cobertura nubosa Promedio: <strong>8.7%</strong></div>
+                <div>Escenas válidas: <strong>127</strong></div>
+                <div style="color:var(--success-green); font-weight:bold;">Análisis EXCELENTE ⭐⭐⭐⭐⭐</div>
+            </div>
+
+            <div class="panel-title" style="margin-top:15px;">🎬 ESCENAS UTILIZADAS</div>
+            <div style="max-height:180px; overflow-y:auto;">
                 <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Ubigeo/Polígono</th>
-                            <th>Índice</th>
-                            <th>Año</th>
-                            <th>Sensor</th>
-                            <th>Área (km²)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tablaResultados"></tbody>
+                    <thead><tr><th>ID Escena</th><th>Nubes</th></tr></thead>
+                    <tbody>
+                        <tr><td>LT05_L1TP_006007_19940211</td><td>5.2%</td></tr>
+                        <tr><td>LT05_L1TP_006007_19990113</td><td>3.1%</td></tr>
+                        <tr><td>LT05_L1TP_006007_20050315</td><td>8.1%</td></tr>
+                        <tr><td>LT05_L1TP_006007_20110517</td><td>7.1%</td></tr>
+                    </tbody>
                 </table>
             </div>
-        </div>
+
+            <div class="panel-title" style="margin-top:15px;">📜 HISTORIAL DE CONSULTAS</div>
+            <div style="max-height:150px; overflow-y:auto;">
+                <table class="data-table">
+                    <thead><tr><th>Fecha</th><th>Índice</th><th>Sensor</th></tr></thead>
+                    <tbody>
+                        <tr><td>18/07/2026</td><td>NDVI</td><td>Landsat 5</td></tr>
+                        <tr><td>15/07/2026</td><td>EVI</td><td>Landsat 8</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </aside>
+
     </div>
 
-    <!-- CONTENEDOR DE PANTALLA PRINCIPAL DERECHA -->
-    <div id="map-container">
-        <div class="header-dashboard-controls">
-            <div class="visor-tabs">
-                <button id="btn-tab-mapa" class="tab-btn active" onclick="switchTab('mapa')">🛰️ Visor de Mapa Satelital</button>
-                <button id="btn-tab-estadistica" class="tab-btn" onclick="switchTab('estadistica')">📊 Analytics Dashboard GEE</button>
-            </div>
-        </div>
+    <!-- FOOTER -->
+    <footer>
+        <div><strong>GEOVISOR PERÚ v3.0</strong> | Plataforma de análisis espacial para investigación ambiental.</div>
+        <div>Datos: Google Earth Engine | Desarrollado por Alessandro Ahualla Molina</div>
+    </footer>
 
-        <!-- PESTAÑA VISOR -->
-        <div id="tab-mapa" class="tab-content active">
-            <div id="map"></div>
-            
-            <div class="info-overlay">
-                <h4>Engine Telemetry Active</h4>
-                <p>Capa Activa: <span id="indiceNombre">NDVI</span></p>
-                <p>Plataforma Satélite: <span id="sensor">Landsat 8</span></p>
-                <p>Filtro Temporal: <span id="anio">2026</span></p>
-            </div>
-
-            <div class="legend-overlay" id="mapLegend">
-                <div class="legend-title">Rango de Valores Espectrales</div>
-                <div class="legend-scale">
-                    <div class="legend-item"><div class="legend-color" style="background: #006100;"></div> Alta Vitalidad (> 0.6)</div>
-                    <div class="legend-item"><div class="legend-color" style="background: #7aab00;"></div> Cobertura Media (0.3 - 0.6)</div>
-                    <div class="legend-item"><div class="legend-color" style="background: #dfef00;"></div> Suelo Transición (0.1 - 0.3)</div>
-                    <div class="legend-item"><div class="legend-color" style="background: #e60000;"></div> Cuerpos de Agua (< 0.1)</div>
-                </div>
-            </div>
-
-            <div class="toolbar-right">
-                <button class="toolbar-btn" title="Mapa Base">🗺️</button>
-                <button class="toolbar-btn" title="Geolocalización">📍</button>
-            </div>
-        </div>
-
-        <!-- PESTAÑA ESTADÍSTICAS -->
-        <div id="tab-estadistica" class="tab-content">
-            <div class="charts-dashboard-grid">
-                <div class="chart-card">
-                    <h3>Curva de Histograma de Frecuencia de Pixeles</h3>
-                    <div class="chart-wrapper"><canvas id="chartHistograma"></canvas></div>
-                </div>
-                <div class="chart-card">
-                    <h3>Análisis Temporal Multianual Tendencial</h3>
-                    <div class="chart-wrapper"><canvas id="chartClases"></canvas></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- DASHBOARD RESULTADOS KPI (Actualizados dinámicamente por Python/App.js) -->
-        <div class="dashboard-results">
-            <div class="result-card">
-                <p>Área Polígono Analizado</p>
-                <h1 id="resArea">0.00 km²</h1>
-            </div>
-            <div class="result-card">
-                <p>Media Espectral (Mean)</p>
-                <h1 id="resProm">0.00</h1>
-            </div>
-            <div class="result-card">
-                <p>Cresta Máxima Registrada</p>
-                <h1 id="resMax">0.00</h1>
-            </div>
-            <div class="result-card">
-                <p>Límite Mínimo Obtenido</p>
-                <h1 id="resMin">0.00</h1>
-            </div>
-        </div>
-    </div>
-
-    <!-- CARGA DE DEPENDENCIAS CORE -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <!-- LÓGICA DE INTERFAZ Y ENLACE DE DATOS -->
+    <!-- SCRIPT PARA RENDERIZAR GRÁFICOS REALES -->
     <script>
-        let map, currentMarker, histogramChart, classesChart;
-
-        // Base de Datos mock para Ubigeo y Áreas de Conservación (Simulando lo extraído de ubigeo.js)
-        const dptosPeru = ["Ancash", "Arequipa", "Cajamarca", "Cusco", "La Libertad", "Lima", "Loreto", "Piura"];
-        const anpsPeru = {
-            anpdefinitivas: ["Parque Nacional Huascarán", "Reserva Nacional de Paracas", "Santuario Histórico de Machu Picchu"],
-            acr: ["ACR Humedales de Ventanilla", "ACR Bosques Secos de Salitral"],
-            acp: ["ACP El Cañoncillo", "ACP Milpuj La Heredad"],
-            zona_reservada: ["Zona Reservada Chancaybaños", "Zona Reservada Sierra del Divisor"],
-            zona_de_amortiguamiento: ["Zona de Amortiguamiento Tambopata", "Zona de Amortiguamiento Huascarán"]
-        };
-
-        document.addEventListener('DOMContentLoaded', () => {
-            initMap();
-            populateFormOptions();
-            setupInteractivity();
-            initCharts();
-            
-            // Cierre del Loader Inicial
-            setTimeout(() => {
-                const loader = document.getElementById('loader');
-                if(loader) { loader.style.opacity = '0'; setTimeout(() => loader.remove(), 400); }
-            }, 800);
+        // 1. Gráfico Circular (Distribución de Clases)
+        new Chart(document.getElementById('pieChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Veg. Alta', 'Veg. Media', 'Suelo Desnudo', 'Agua/Nubes'],
+                datasets: [{
+                    data: [25.6, 35.4, 32.6, 6.4],
+                    backgroundColor: ['#2ecc71', '#27ae60', '#f1c40f', '#3498db']
+                }]
+            },
+            options: { responsive: true, plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: { size: 9 } } } } }
         });
 
-        function initMap() {
-            map = L.map('map').setView([-9.19, -75.015], 6);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; CARTO'
-            }).addTo(map);
-        }
+        // 2. Gráfico de Barras (Histograma)
+        new Chart(document.getElementById('barChart'), {
+            type: 'bar',
+            data: {
+                labels: ['-0.2', '0.0', '0.2', '0.4', '0.6', '0.8'],
+                datasets: [{
+                    label: 'Frecuencia de píxeles',
+                    data: [100, 400, 1200, 2100, 800, 200],
+                    backgroundColor: '#34495e'
+                }]
+            },
+            options: { responsive: true, scales: { y: { display: false } }, plugins: { legend: { display: false } } }
+        });
 
-        function populateFormOptions() {
-            const dptoSelect = document.getElementById('departamento');
-            dptoSelect.innerHTML = '<option value="">Seleccione Departamento...</option>';
-            dptosPeru.forEach(d => {
-                let opt = document.createElement('option'); opt.value = d; opt.innerText = d;
-                dptoSelect.appendChild(opt);
-            });
-
-            const anioInicio = document.getElementById('anioInicio');
-            const anioFinal = document.getElementById('anioFinal');
-            for(let a = 1984; a <= 2026; a++) {
-                anioInicio.appendChild(new Option(a, a));
-                anioFinal.appendChild(new Option(a, a));
-            }
-            anioInicio.value = "2015"; anioFinal.value = "2026";
-        }
-
-        function setupInteractivity() {
-            // Manejador del Enfoque de Consulta (Código 2)
-            document.getElementById('tipoConsulta').addEventListener('change', (e) => {
-                if(e.target.value === 'politico') {
-                    document.getElementById('grupoPolitico').style.style.display = 'block';
-                    document.getElementById('grupoAmbiental').style.style.display = 'none';
-                } else {
-                    document.getElementById('grupoPolitico').style.style.display = 'none';
-                    document.getElementById('grupoAmbiental').style.style.display = 'block';
-                }
-            });
-
-            // Manejador Dinámico de Provincias y Distritos (Integración con tu app.js futura)
-            document.getElementById('departamento').addEventListener('change', (e) => {
-                const prov = document.getElementById('provincia');
-                prov.innerHTML = '<option value="">Seleccione...</option>';
-                if(e.target.value) {
-                    ["Provincia Central", "Provincia Periférica"].forEach(p => {
-                        prov.add(new Option(p, p));
-                    });
-                }
-            });
-
-            // Manejador Dinámico de ANPs (Código 2)
-            document.getElementById('capaAmbiental').addEventListener('change', (e) => {
-                const nombreArea = document.getElementById('nombreArea');
-                nombreArea.innerHTML = '<option value="">Seleccione Polígono...</option>';
-                if(e.target.value && anpsPeru[e.target.value]) {
-                    nombreArea.disabled = false;
-                    anpsPeru[e.target.value].forEach(area => {
-                        nombreArea.add(new Option(area, area));
-                    });
-                } else {
-                    nombreArea.disabled = true;
-                }
-            });
-
-            // Acción del Botón Consultar: Envía/Simula la actualización desde Python / GEE
-            document.getElementById('consultar').addEventListener('click', () => {
-                // Captura de datos seleccionados
-                const sat = document.getElementById('satelite').value;
-                const ind = document.getElementById('indice').value;
-                const aFin = document.getElementById('anioFinal').value;
-
-                // Actualizar HUD superior del mapa
-                document.getElementById('sensor').innerText = sat;
-                document.getElementById('indiceNombre').innerText = ind;
-                document.getElementById('anio').innerText = aFin;
-
-                // AQUÍ: Tu app.js capturará la respuesta AJAX / Fetch desde tu script de Python
-                // Para efectos de visualización, renderizamos la respuesta en la interfaz:
-                renderCalculatedResults({
-                    area: (Math.random() * 120 + 10).toFixed(2),
-                    promedio: (Math.random() * 0.5 + 0.2).toFixed(3),
-                    max: (Math.random() * 0.2 + 0.7).toFixed(3),
-                    min: (Math.random() * 0.2 - 0.1).toFixed(3),
-                    polygonName: document.getElementById('tipoConsulta').value === 'politico' ? 
-                        (document.getElementById('departamento').value || "Ucayali") : 
-                        (document.getElementById('nombreArea').value || "Reserva Protegida")
-                });
-            });
-
-            document.getElementById('limpiar').addEventListener('click', () => {
-                document.getElementById('resArea').innerText = "0.00 km²";
-                document.getElementById('resProm').innerText = "0.00";
-                document.getElementById('resMax').innerText = "0.00";
-                document.getElementById('resMin').innerText = "0.00";
-                if(currentMarker) map.removeLayer(currentMarker);
-                map.setView([-9.19, -75.015], 6);
-            });
-        }
-
-        // Función Core para inyectar los resultados devueltos por app.js / Python
-        function renderCalculatedResults(data) {
-            // 1. Pintar en las tarjetas KPI inferiores
-            document.getElementById('resArea').innerText = `${data.area} km²`;
-            document.getElementById('resProm').innerText = data.promedio;
-            document.getElementById('resMax').innerText = data.max;
-            document.getElementById('resMin').innerText = data.min;
-
-            // 2. Insertar fila en la Tabla de Historial (Sección 06)
-            const tabla = document.getElementById('tablaResultados');
-            const row = `<tr>
-                <td><strong>${data.polygonName}</strong></td>
-                <td><span style="color:var(--accent-purple)">${document.getElementById('indice').value}</span></td>
-                <td>${document.getElementById('anioFinal').value}</td>
-                <td>${document.getElementById('satelite').value.split(' ')[0]}</td>
-                <td>${data.area}</td>
-            </tr>`;
-            tabla.innerHTML = row + tabla.innerHTML;
-
-            // 3. Simular bounding box/geometría en mapa
-            if(currentMarker) map.removeLayer(currentMarker);
-            const centerLat = -9.0 - (Math.random() * 3);
-            const centerLng = -75.0 - (Math.random() * 2);
-            currentMarker = L.rectangle([
-                [centerLat - 0.1, centerLng - 0.1],
-                [centerLat + 0.1, centerLng + 0.1]
-            ], {color: "#10b981", weight: 2, fillOpacity: 0.1}).addTo(map);
-            map.setView([centerLat, centerLng], 11);
-
-            // 4. Actualizar los gráficos
-            updateCharts();
-        }
-
-        window.switchTab = function(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById('tab-' + tabId).classList.add('active');
-            document.getElementById('btn-tab-' + tabId).classList.add('active');
-            if(tabId === 'mapa' && map) { setTimeout(() => { map.invalidateSize(); }, 50); }
-        };
-
-        function initCharts() {
-            histogramChart = new Chart(document.getElementById('chartHistograma').getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: ['-0.2', '0.0', '0.2', '0.4', '0.6', '0.8'],
-                    datasets: [{ label: 'Pixeles', data: [50, 200, 900, 2400, 1500, 400], backgroundColor: '#2563eb' }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-
-            classesChart = new Chart(document.getElementById('chartClases').getContext('2d'), {
-                type: 'line',
-                data: {
-                    labels: ['2021', '2022', '2023', '2024', '2025', '2026'],
-                    datasets: [{ label: 'Media Histórica', data: [0.41, 0.44, 0.42, 0.49, 0.52, 0.50], borderColor: '#10b981', tension: 0.2 }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-        }
-
-        function updateCharts() {
-            if(!histogramChart || !classesChart) return;
-            histogramChart.data.datasets[0].data = Array.from({length: 6}, () => Math.floor(Math.random() * 3000));
-            histogramChart.update();
-            classesChart.data.datasets[0].data = Array.from({length: 6}, () => (Math.random() * 0.4 + 0.2));
-            classesChart.update();
-        }
+        // 3. Gráfico de Líneas (Tendencia)
+        new Chart(document.getElementById('lineChart'), {
+            type: 'line',
+            data: {
+                labels: ['1994', '1998', '2002', '2006', '2010', '2011'],
+                datasets: [{
+                    label: 'Media NDVI',
+                    data: [0.54, 0.61, 0.58, 0.65, 0.62, 0.67],
+                    borderColor: '#0f52ba',
+                    tension: 0.2,
+                    fill: false
+                }]
+            },
+            options: { responsive: true, plugins: { legend: { display: false } } }
+        });
     </script>
 </body>
 </html>
