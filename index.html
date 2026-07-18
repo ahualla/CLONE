@@ -18,7 +18,7 @@
             --border-color: #e2e8f0;
             --primary-blue: #2980b9;
             --success-green: #27ae60;
-            --card-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
+            --card-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
         * {
@@ -48,18 +48,18 @@
             justify-content: space-between;
             align-items: center;
             height: 50px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
             z-index: 1000;
+            flex-shrink: 0;
         }
         .logo-area { display: flex; align-items: center; gap: 8px; }
-        .logo-title { font-weight: 700; font-size: 15px; color: #1a202c; letter-spacing: 0.5px; }
+        .logo-title { font-weight: 700; font-size: 15px; color: #1a202c; }
         .nav-links { display: flex; gap: 20px; list-style: none; }
-        .nav-links a { text-decoration: none; color: #718096; font-weight: 600; font-size: 12px; transition: color 0.2s; }
-        .nav-links a:hover, .nav-links a.active { color: var(--primary-blue); }
+        .nav-links a { text-decoration: none; color: #718096; font-weight: 600; font-size: 12px; }
+        .nav-links a.active { color: var(--primary-blue); }
         .user-profile { display: flex; align-items: center; gap: 8px; }
         .user-avatar { width: 28px; height: 28px; background: #cbd5e0; border-radius: 50%; }
 
-        /* --- LAYOUT DE 3 COLUMNAS PRINCIPALES --- */
+        /* --- LAYOUT DE CONTENEDOR PRINCIPAL --- */
         .dashboard-container {
             display: grid;
             grid-template-columns: 310px 1fr 310px;
@@ -70,7 +70,7 @@
             overflow: hidden;
         }
 
-        /* Paneles Laterales Estilizados */
+        /* Paneles Laterales Estables */
         .panel-lateral {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -78,9 +78,10 @@
             padding: 14px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
             overflow-y: auto;
             box-shadow: var(--card-shadow);
+            height: 100%;
         }
         
         .panel-title {
@@ -90,19 +91,18 @@
             color: #1a202c;
             border-bottom: 2px solid var(--border-color);
             padding-bottom: 5px;
-            letter-spacing: 0.5px;
+            margin-bottom: 2px;
         }
 
         .section-title {
             font-size: 11px;
             font-weight: 700;
             color: #4a5568;
-            margin-bottom: 2px;
+            margin-top: 5px;
         }
 
-        /* Formularios alineados */
-        .form-group { margin-bottom: 4px; }
-        .form-group label { display: block; font-size: 11px; font-weight: 600; margin-bottom: 4px; color: #4a5568; }
+        .form-group { margin-bottom: 2px; }
+        .form-group label { display: block; font-size: 11px; font-weight: 600; margin-bottom: 3px; color: #4a5568; }
         .form-control {
             width: 100%;
             padding: 6px 10px;
@@ -111,34 +111,32 @@
             font-size: 11px;
             background-color: #f7fafc;
             color: var(--text-dark);
-            outline: none;
         }
-        .form-control:focus { border-color: var(--primary-blue); background-color: #fff; }
         .row-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
-        /* Botones de Acción */
-        .btn-container { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: auto; padding-top: 10px; }
+        .btn-container { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: auto; padding-top: 5px; }
         .btn { padding: 8px; border: none; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; text-align: center; }
         .btn-primary { background: #3182ce; color: #fff; }
         .btn-secondary { background: #38a169; color: #fff; }
 
-        /* --- COLUMNA CENTRAL (Flujo de Datos) --- */
+        /* --- COLUMNA CENTRAL (Flujo Vertical Estricto y Sin Desbordes) --- */
         .center-column {
             display: flex;
             flex-direction: column;
             gap: 12px;
-            overflow-y: auto;
+            height: 100%;
+            overflow: hidden; /* Evita scroll general en el centro */
         }
 
-        /* Mapa de Leaflet */
+        /* Proporciones rígidas para congelar la vista */
         .map-wrapper {
-            height: 42%;
-            min-height: 260px;
+            height: 42%; /* El mapa ocupa un porcentaje controlado */
             position: relative;
             border-radius: 8px;
             border: 1px solid var(--border-color);
             overflow: hidden;
             box-shadow: var(--card-shadow);
+            flex-shrink: 0;
         }
         #map { width: 100%; height: 100%; }
         
@@ -148,7 +146,7 @@
             background: rgba(255,255,255,0.95);
             padding: 8px 12px;
             border-radius: 6px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             z-index: 1000;
             border-left: 4px solid var(--success-green);
             width: 210px;
@@ -156,73 +154,85 @@
         .info-overlay h4 { font-size: 10px; margin-bottom: 4px; font-weight: 700; color: #2d3748; }
         .info-overlay p { font-size: 10px; margin-bottom: 2px; display: flex; justify-content: space-between; color: #4a5568; }
 
-        /* Tarjetas de Métricas Ordenadas */
+        /* Fila de Métricas Horizontales Rígida */
         .metrics-row {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 8px;
+            flex-shrink: 0;
         }
         .metric-card {
             background: #fff;
             border: 1px solid var(--border-color);
             border-radius: 6px;
-            padding: 8px 6px;
+            padding: 6px 4px;
             text-align: center;
             box-shadow: var(--card-shadow);
         }
-        .metric-lbl { font-size: 9px; font-weight: 700; color: #718096; text-transform: uppercase; }
-        .metric-val { font-size: 13px; font-weight: 700; color: #1a202c; margin-top: 2px; }
+        .metric-lbl { font-size: 8.5px; font-weight: 700; color: #718096; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .metric-val { font-size: 12px; font-weight: 700; color: #1a202c; margin-top: 2px; }
 
-        /* Grid de Gráficos e Historiales */
-        .charts-grid {
+        /* Sección Inferior de Gráficos (Flexible pero autocontenida) */
+        .bottom-charts-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-height: 0; /* Permite que los hijos respeten el espacio flex */
+        }
+
+        .charts-grid-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
+            height: 58%;
+            min-height: 0;
         }
+        
         .chart-box {
             background: #fff;
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            padding: 12px;
-            height: 180px;
+            padding: 10px;
             box-shadow: var(--card-shadow);
             display: flex;
             flex-direction: column;
+            height: 100%;
         }
-        .chart-title { font-weight: 700; font-size: 10px; color: #718096; margin-bottom: 8px; text-transform: uppercase; }
+        .chart-title { font-weight: 700; font-size: 10px; color: #718096; margin-bottom: 4px; text-transform: uppercase; }
+        .chart-canvas-container { flex: 1; position: relative; min-height: 0; width: 100%; height: 100%; }
 
         .chart-box-wide {
             background: #fff;
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            padding: 12px;
-            height: 140px;
+            padding: 10px;
             box-shadow: var(--card-shadow);
             display: flex;
             flex-direction: column;
-            margin-top: auto;
+            height: 38%;
+            min-height: 0;
         }
 
-        /* Tablas Limpias */
+        /* Tablas de Columnas Laterales */
         .table-container {
             flex: 1;
             overflow-y: auto;
             border: 1px solid var(--border-color);
             border-radius: 6px;
+            min-height: 60px;
         }
         .data-table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; }
         .data-table th { position: sticky; top: 0; background: #f7fafc; padding: 6px 8px; font-weight: 700; color: #4a5568; border-bottom: 2px solid var(--border-color); }
-        .data-table td { padding: 6px 8px; border-bottom: 1px solid var(--border-color); color: #2d3748; }
+        .data-table td { padding: 5px 8px; border-bottom: 1px solid var(--border-color); color: #2d3748; }
         .data-table tr:hover { background: #f8fafc; }
 
-        /* Formato de Descarga */
         .container-descargas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-        .btn-download { padding: 6px; font-size: 10px; border: 1px solid #cbd5e0; background: #fff; border-radius: 6px; cursor: pointer; font-weight: 600; text-align: center; transition: background 0.2s; }
-        .btn-download:hover { background: #f7fafc; }
+        .btn-download { padding: 5px; font-size: 10px; border: 1px solid #cbd5e0; background: #fff; border-radius: 6px; cursor: pointer; font-weight: 600; text-align: center; }
 
         /* Loader */
-        #loader { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(26, 32, 44, 0.85); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; font-size: 13px; font-weight: 600; }
-        .spinner { width: 35px; height: 35px; border: 3px solid #e2e8f0; border-top: 3px solid #3182ce; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 10px; }
+        #loader { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(26, 32, 44, 0.85); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; font-size: 12px; }
+        .spinner { width: 32px; height: 32px; border: 3px solid #e2e8f0; border-top: 3px solid #3182ce; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 8px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
@@ -262,10 +272,10 @@
         </div>
     </header>
 
-    <!-- PANEL GRID CONTENEDOR -->
+    <!-- MAIN DASHBOARD -->
     <div class="dashboard-container">
         
-        <!-- IZQUIERDA: MENÚ CONFIGURACIÓN -->
+        <!-- COLUMNA IZQUIERDA -->
         <aside class="panel-lateral">
             <div class="panel-title">📋 CONFIGURACIÓN DE ANÁLISIS</div>
             
@@ -274,7 +284,6 @@
                 <label>Modalidad de Análisis</label>
                 <select id="tipoConsulta" class="form-control">
                     <option value="politico">División Político-Administrativa</option>
-                    <option value="conservacion">Áreas Naturales y Conservación (AMPs)</option>
                 </select>
             </div>
 
@@ -282,9 +291,7 @@
             <div id="grupoPolitico">
                 <div class="form-group">
                     <label>Departamento</label>
-                    <select id="departamento" class="form-control">
-                        <option>Apurímac</option>
-                    </select>
+                    <select id="departamento" class="form-control"><option>Apurímac</option></select>
                 </div>
                 <div class="row-grid">
                     <div class="form-group">
@@ -298,18 +305,16 @@
                 </div>
             </div>
 
-            <div style="background:#f0fff4; padding:8px; border-radius:6px; font-size:10px; border:1px solid #c6f6d5;">
+            <div style="background:#f0fff4; padding:6px; border-radius:6px; font-size:10px; border:1px solid #c6f6d5; margin-top:2px;">
                 <strong style="color:var(--success-green);">ℹ️ INFORMACIÓN DEL ÁREA</strong><br>
                 Categoría: Distrito Seleccionado<br>
-                Región/Sector: Sierra Sur Central / Apurímac
+                Región/Sector: Sierra Sur Central
             </div>
 
             <div class="section-title">3. PARÁMETROS DE MISIÓN</div>
             <div class="form-group">
                 <label>Sensor Satelital</label>
-                <select id="satelite" class="form-control">
-                    <option>Landsat 5 TM (1984 - 2011)</option>
-                </select>
+                <select id="satelite" class="form-control"><option>Landsat 5 TM (1984 - 2011)</option></select>
             </div>
             <div class="form-group">
                 <label>Objetivo del Estudio</label>
@@ -340,21 +345,21 @@
             </div>
         </aside>
 
-        <!-- CENTRO: MAPA, MÉTRICAS Y GRÁFICOS -->
+        <!-- COLUMNA CENTRAL (DISTRIBUCIÓN CORREGIDA) -->
         <main class="center-column">
             
+            <!-- MAPA -->
             <div class="map-wrapper">
                 <div id="map"></div>
                 <div class="info-overlay">
                     <h4>🟢 CAPA ACTIVA - GEE</h4>
-                    <p>Índice Espectral: <span id="indiceNombre">NDVI</span></p>
-                    <p>Plataforma: <span id="sensor">Landsat 5 TM</span></p>
-                    <p>Resolución: <span>30 metros</span></p>
-                    <p>Periodo: <span id="anio">1984 - 2011</span></p>
+                    <p>Índice Espectral: <span>NDVI</span></p>
+                    <p>Plataforma: <span>Landsat 5 TM</span></p>
+                    <p>Periodo: <span>1984 - 2011</span></p>
                 </div>
             </div>
 
-            <!-- Fila de métricas ajustadas e idénticas -->
+            <!-- MÉTRICAS (Fijas sin saltos de línea) -->
             <div class="metrics-row">
                 <div class="metric-card"><div class="metric-lbl">ÁREA DE ESTUDIO</div><div class="metric-val" id="resArea">179.23 km²</div></div>
                 <div class="metric-card"><div class="metric-lbl">VALOR PROMEDIO</div><div class="metric-val" id="resProm">0.122</div></div>
@@ -365,32 +370,33 @@
                 <div class="metric-card"><div class="metric-lbl">FECHA ANÁLISIS</div><div class="metric-val" style="font-size:10px;">18/07/2026</div></div>
             </div>
 
-            <!-- Cuadrícula de Gráficos perfectamente simétricos -->
-            <div class="charts-grid">
-                <div class="chart-box">
-                    <div class="chart-title">DISTRIBUCIÓN DE CLASES NDVI</div>
-                    <canvas id="pieChart"></canvas>
+            <!-- SECCIÓN INFERIOR DE GRÁFICOS CONTENIDOS -->
+            <div class="bottom-charts-section">
+                <div class="charts-grid-row">
+                    <div class="chart-box">
+                        <div class="chart-title">DISTRIBUCIÓN DE CLASES NDVI</div>
+                        <div class="chart-canvas-container"><canvas id="pieChart"></canvas></div>
+                    </div>
+                    <div class="chart-box">
+                        <div class="chart-title">HISTOGRAMA NDVI</div>
+                        <div class="chart-canvas-container"><canvas id="barChart"></canvas></div>
+                    </div>
                 </div>
-                <div class="chart-box">
-                    <div class="chart-title">HISTOGRAMA NDVI</div>
-                    <canvas id="barChart"></canvas>
+                <div class="chart-box-wide">
+                    <div class="chart-title">GRÁFICO TEMPORAL DE TENDENCIAS</div>
+                    <div class="chart-canvas-container"><canvas id="lineChart"></canvas></div>
                 </div>
-            </div>
-
-            <div class="chart-box-wide">
-                <div class="chart-title">GRÁFICO TEMPORAL DE TENDENCIAS</div>
-                <canvas id="lineChart"></canvas>
             </div>
 
         </main>
 
-        <!-- DERECHA: CALIDAD, ESCENAS E HISTORIAL -->
+        <!-- COLUMNA DERECHA -->
         <aside class="panel-lateral">
             <div class="panel-title">⭐ CALIDAD DEL ANÁLISIS</div>
-            <div style="background:#f7fafc; padding:10px; border-radius:6px; border:1px solid var(--border-color);">
-                <div style="margin-bottom:3px;">Cobertura Nubosa Promedio: <strong>8.7%</strong></div>
-                <div style="margin-bottom:5px;">Escenas procesadas: <strong>127</strong></div>
-                <div style="color:var(--success-green); font-weight:700;">Análisis EXCELENTE ⭐⭐⭐⭐⭐</div>
+            <div style="background:#f7fafc; padding:8px; border-radius:6px; border:1px solid var(--border-color);">
+                <div>Cobertura Nubosa: <strong>8.7%</strong></div>
+                <div>Escenas procesadas: <strong>127</strong></div>
+                <div style="color:var(--success-green); font-weight:700; margin-top:2px;">Análisis EXCELENTE ⭐⭐⭐⭐⭐</div>
             </div>
 
             <div class="panel-title">🎬 ESCENAS UTILIZADAS</div>
@@ -425,17 +431,19 @@
     <script src="js/ubigeo.js"></script>
     <script src="js/app.js"></script>
 
-    <!-- RENDERIZADO Y CONTROL DE GRÁFICOS -->
+    <!-- CONTROLADORES DE RENDERIZADO INTERNO -->
     <script>
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 const loader = document.getElementById('loader');
                 loader.style.opacity = '0';
-                setTimeout(() => loader.style.display = 'none', 300);
-            }, 500);
+                setTimeout(() => loader.style.display = 'none', 200);
+            }, 400);
         });
 
-        // Gráfico Circular
+        // Configuración común para forzar el auto-ajuste de Chart.js al contenedor
+        const chartOptions = { responsive: true, maintainAspectRatio: false };
+
         new Chart(document.getElementById('pieChart'), {
             type: 'doughnut',
             data: {
@@ -445,10 +453,9 @@
                     backgroundColor: ['#2ecc71', '#27ae60', '#e67e22', '#3498db']
                 }]
             },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 9 } } } } }
+            options: { ...chartOptions, plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 9 } } } } }
         });
 
-        // Histograma
         new Chart(document.getElementById('barChart'), {
             type: 'bar',
             data: {
@@ -458,10 +465,9 @@
                     backgroundColor: '#34495e'
                 }]
             },
-            options: { responsive: true, maintainAspectRatio: false, scales: { y: { display: false } }, plugins: { legend: { display: false } } }
+            options: { ...chartOptions, scales: { y: { display: false } }, plugins: { legend: { display: false } } }
         });
 
-        // Tendencia
         new Chart(document.getElementById('lineChart'), {
             type: 'line',
             data: {
@@ -474,7 +480,7 @@
                     tension: 0.1
                 }]
             },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            options: { ...chartOptions, plugins: { legend: { display: false } } }
         });
     </script>
 </body>
