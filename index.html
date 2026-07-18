@@ -47,15 +47,13 @@
         body { background-color: var(--bg-main); color: var(--text-primary); display: flex; width: 100vw; height: 100vh; overflow: hidden; padding: 12px; gap: 12px; }
 
         /* INTERFAZ DEL SKELETON LOADER */
-        #loader { position: fixed; inset: 0; background: var(--bg-main); z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 16px; transition: opacity 0.4s ease; }
+        #loader { position: fixed; inset: 0; background: var(--bg-main); z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 16px; transition: opacity 0.4s ease; pointer-events: none; }
         .spinner-container { position: relative; width: 64px; height: 64px; }
         .spinner-outer { width: 100%; height: 100%; border: 3px solid transparent; border-top-color: var(--brand-primary); border-radius: 50%; animation: spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite; }
         .spinner-inner { position: absolute; inset: 8px; border: 3px solid transparent; border-bottom-color: var(--accent-success); border-radius: 50%; animation: spin-reverse 0.9s linear infinite; }
         #loader p { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
 
-        /*============================================================================
-          SIDEBAR ESTRUCTURAL TÁCTICO IZQUIERDO
-        ============================================================================*/
+        /* SIDEBAR ESTRUCTURAL TÁCTICO IZQUIERDO */
         #sidebar { 
             width: 410px; 
             min-width: 410px;
@@ -170,7 +168,7 @@
         .tab-btn { padding: 8px 18px; border: none; background: transparent; font-size: 0.8rem; font-weight: 700; border-radius: var(--radius-sm); cursor: pointer; color: var(--text-muted); transition: var(--transition-smooth); display: flex; align-items: center; gap: 8px; }
         .tab-btn.active { background: var(--brand-primary); color: white; box-shadow: 0 4px 10px var(--brand-glow); }
 
-        .tab-content { display: none; flex: 1; position: relative; width: 100%; height: 100%; overflow: hidden; }
+        .tab-content { display: none; width: 100%; height: 100%; position: relative; overflow: hidden; }
         .tab-content.active { display: block; }
 
         /* Capa del Mapa Leaflet */
@@ -220,9 +218,7 @@
         .chart-card h3::before { content: ''; width: 4px; height: 12px; background: var(--brand-primary); display: inline-block; border-radius: 2px; }
         .chart-wrapper { flex: 1; width: 100%; height: calc(100% - 40px); position: relative; }
 
-        /*============================================================================
-          DASHBOARD DE KPI / MÉTRICAS DE EXTENSIÓN INFERIOR
-        ============================================================================*/
+        /* DASHBOARD DE KPI / MÉTRICAS DE EXTENSIÓN INFERIOR */
         .dashboard-results { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; min-height: 90px; }
         .result-card { 
             background: var(--bg-sidebar); padding: 16px; border-radius: var(--radius-lg); 
@@ -298,25 +294,25 @@
             <div class="section-panel">
                 <div class="section-title"><span>02</span> Límites Territoriales</div>
                 
-                <!-- Grupo Político Administrativo (Por defecto) -->
+                <!-- Grupo Político Administrativo -->
                 <div id="grupoPolitico">
                     <div class="form-group">
                         <label for="departamento">Región / Departamento</label>
                         <select id="departamento" class="form-control">
-                            <option value="Seleccione...">Cargando Regiones...</option>
+                            <option value="">Seleccione Región...</option>
                         </select>
                     </div>
                     <div class="row-grid">
                         <div class="form-group">
                             <label for="provincia">Provincia</label>
                             <select id="provincia" class="form-control">
-                                <option value="Seleccione...">Filtro Base...</option>
+                                <option value="">Filtro Base...</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="distrito">Distrito</label>
                             <select id="distrito" class="form-control">
-                                <option value="Seleccione...">Filtro Detalle...</option>
+                                <option value="">Filtro Detalle...</option>
                             </select>
                         </div>
                     </div>
@@ -327,7 +323,7 @@
                     <div class="form-group">
                         <label for="capaAmbiental">Sistemas de Conservación</label>
                         <select id="capaAmbiental" class="form-control">
-                            <option value="Seleccione...">Seleccione Categoría...</option>
+                            <option value="">Seleccione Categoría...</option>
                             <option value="anpdefinitivas">ANP Administración Nacional</option>
                             <option value="acr">Áreas de Conservación Regional (ACR)</option>
                             <option value="acp">Áreas de Conservación Privada (ACP)</option>
@@ -337,7 +333,7 @@
                     <div class="form-group">
                         <label for="nombreArea">Polígono Específico</label>
                         <select id="nombreArea" class="form-control" disabled>
-                            <option value="Seleccione...">Esperando Categoría...</option>
+                            <option value="">Esperando Categoría...</option>
                         </select>
                     </div>
                 </div>
@@ -349,11 +345,11 @@
                 <div class="form-group">
                     <label for="satelite">Constelación Satelital</label>
                     <select id="satelite" class="form-control">
-                        <option value="Landsat 5">Landsat 5 TM (1984 - 2011)</option>
-                        <option value="Landsat 7">Landsat 7 ETM+ (1999 - 2021)</option>
-                        <option value="Landsat 8">Landsat 8 OLI (2013 - Actualidad)</option>
-                        <option value="Landsat 9">Landsat 9 OLI-2 (2021 - Actualidad)</option>
-                        <option value="Sentinel 2">Sentinel 2 MSI (2015 - Actualidad)</option>
+                        <option value="Landsat 5 TM">Landsat 5 TM (1984 - 2011)</option>
+                        <option value="Landsat 7 ETM+">Landsat 7 ETM+ (1999 - 2021)</option>
+                        <option value="Landsat 8 OLI">Landsat 8 OLI (2013 - Actualidad)</option>
+                        <option value="Landsat 9 OLI-2">Landsat 9 OLI-2 (2021 - Actualidad)</option>
+                        <option value="Sentinel 2 MSI">Sentinel 2 MSI (2015 - Actualidad)</option>
                     </select>
                 </div>
                 <div class="row-grid">
@@ -398,10 +394,10 @@
             <div class="section-panel">
                 <div class="section-title"><span>05</span> Pipeline de Exportación</div>
                 <div class="container-descargas">
-                    <button id="btnTiff" class="btn-download">💾 GeoTIFF (Raster)</button>
-                    <button id="btnShp" class="btn-download">📦 ESRI Shapefile</button>
-                    <button id="btnPng" class="btn-download">📸 Render PNG</button>
-                    <button id="btnPdf" class="btn-download">📄 Reporte PDF</button>
+                    <button id="btnTiff" class="btn-download" onclick="alert('Exportando Capa Raster GeoTIFF...')">💾 GeoTIFF (Raster)</button>
+                    <button id="btnShp" class="btn-download" onclick="alert('Generando empaquetado ESRI Shapefile Vector...')">📦 ESRI Shapefile</button>
+                    <button id="btnPng" class="btn-download" onclick="alert('Procesando Render PNG instantáneo...')">📸 Render PNG</button>
+                    <button id="btnPdf" class="btn-download" onclick="alert('Compilando Reporte Analítico PDF...')">📄 Reporte PDF</button>
                 </div>
             </div>
         </div>
@@ -427,7 +423,7 @@
                         </tr>
                     </thead>
                     <tbody id="tablaResultados">
-                        <!-- Carga Dinámica desde app.js -->
+                        <!-- Historial dinámico -->
                     </tbody>
                 </table>
             </div>
@@ -440,11 +436,11 @@
         <!-- Tab Controls Superiores del Visor -->
         <div class="header-dashboard-controls">
             <div class="visor-tabs">
-                <button class="tab-btn active" onclick="switchTab('mapa')">
+                <button id="btn-tab-mapa" class="tab-btn active" onclick="switchTab('mapa')">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
                     Visor de Mapa Satelital
                 </button>
-                <button class="tab-btn" onclick="switchTab('estadistica')">
+                <button id="btn-tab-estadistica" class="tab-btn" onclick="switchTab('estadistica')">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
                     Analytics Dashboard GEE
                 </button>
@@ -455,7 +451,7 @@
         <div id="tab-mapa" class="tab-content active">
             <div id="map"></div>
             
-            <!-- HUD Teatral de Capas Flotantes Activas -->
+            <!-- HUD de Capas Flotantes Activas -->
             <div class="info-overlay">
                 <h4>Engine Telemetry Active</h4>
                 <p>Capa Activa: <span id="indiceNombre">NDVI Standard</span></p>
@@ -476,9 +472,9 @@
 
             <!-- Menú Rápido Flotante -->
             <div class="toolbar-right">
-                <button class="toolbar-btn" title="Alternar Mapa Base">🛰️</button>
-                <button class="toolbar-btn" title="Calibrar Escala">📐</button>
-                <button class="toolbar-btn" title="Pantalla Táctica Completa">📺</button>
+                <button class="toolbar-btn" title="Alternar Mapa Base" onclick="alert('Alternando a capas satelitales extendidas...')">🛰️</button>
+                <button class="toolbar-btn" title="Calibrar Escala" onclick="alert('Calibrando geometría espectral...')">📐</button>
+                <button class="toolbar-btn" title="Pantalla Completa" onclick="alert('Cambiando a modo inmersivo...')">📺</button>
             </div>
         </div>
 
@@ -500,7 +496,7 @@
             </div>
         </div>
 
-        <!-- ZONA DE CONTENEDORES KPI INFERIORES DE ALTO NIVEL -->
+        <!-- ZONA DE CONTENEDORES KPI INFERIORES -->
         <div class="dashboard-results">
             <div class="result-card">
                 <p>Área Polígono Analizado</p>
@@ -521,35 +517,245 @@
         </div>
     </div>
 
-    <!-- CARGA DE DEPENDENCIAS CORE EXTERNAs -->
+    <!-- CARGA DE DEPENDENCIAS CORE -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <script src="js/ubigeo.js"></script>
-    <script src="js/app.js"></script>
-    
-    <!-- Script de Control Táctico de Interfaz -->
+    <!-- LÓGICA CORE INTEGRADA COMPLETA (Reemplaza js/app.js y ubigeo.js para total autonomía) -->
     <script>
-        function switchTab(tabId) {
+        let map, currentMarker, histogramChart, classesChart;
+
+        // Base de Datos Estática para simular el Ubigeo Peruano y ANPs
+        const dptosPeru = ["Lima", "La Libertad", "Piura", "Cajamarca", "Cusco", "Loreto", "Arequipa", "Ancash"];
+        const anpsPeru = {
+            anpdefinitivas: ["Parque Nacional Huascarán", "Reserva Nacional de Paracas", "Santuario Histórico de Machu Picchu"],
+            acr: ["ACR Humedales de Ventanilla", "ACR Bosques Secos de Salitral"],
+            acp: ["ACP El Cañoncillo", "ACP Milpuj La Heredad"],
+            zona_reservada: ["Zona Reservada Chancaybaños", "Zona Reservada Sierra del Divisor"]
+        };
+
+        // Inicialización General
+        document.addEventListener('DOMContentLoaded', () => {
+            initMap();
+            populateFormOptions();
+            setupInteractivity();
+            initCharts();
+            
+            // Ocultar Loader de manera fluida
+            setTimeout(() => {
+                const loader = document.getElementById('loader');
+                if(loader) {
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.remove(), 400);
+                }
+            }, 1000);
+        });
+
+        // 1. Configurar Mapa Base (Usa CartoDB Dark Matter para coincidir con tu diseño oscuro)
+        function initMap() {
+            map = L.map('map').setView([-9.19, -75.015], 6); // Centro de Perú
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap &copy; CARTO',
+                subdomains: 'abcd',
+                maxZoom: 20
+            }).addTo(map);
+        }
+
+        // 2. Poblar inputs de Regiones y Ventana de Años
+        function populateFormOptions() {
+            const dptoSelect = document.getElementById('departamento');
+            dptosPeru.forEach(d => {
+                let opt = document.createElement('option');
+                opt.value = d; opt.innerText = d;
+                dptoSelect.appendChild(opt);
+            });
+
+            const anioInicio = document.getElementById('anioInicio');
+            const anioFinal = document.getElementById('anioFinal');
+            for(let a = 1984; a <= 2026; a++) {
+                let opt1 = document.createElement('option'); opt1.value = a; opt1.innerText = a;
+                let opt2 = document.createElement('option'); opt2.value = a; opt2.innerText = a;
+                anioInicio.appendChild(opt1);
+                anioFinal.appendChild(opt2);
+            }
+            anioInicio.value = "2015";
+            anioFinal.value = "2026";
+        }
+
+        // 3. Controladores de Eventos e Interfaz Dinámica
+        function setupInteractivity() {
+            // Alternar tipos de consultas (Político vs Ambiental)
+            document.getElementById('tipoConsulta').addEventListener('change', (e) => {
+                if(e.target.value === 'politico') {
+                    document.getElementById('grupoPolitico').style.display = 'block';
+                    document.getElementById('grupoAmbiental').style.display = 'none';
+                } else {
+                    document.getElementById('grupoPolitico').style.display = 'none';
+                    document.getElementById('grupoAmbiental').style.display = 'block';
+                }
+            });
+
+            // Simular cambio de Ubigeo (Provincias y distritos dinámicos ficticios)
+            document.getElementById('departamento').addEventListener('change', (e) => {
+                const prov = document.getElementById('provincia');
+                const dist = document.getElementById('distrito');
+                prov.innerHTML = '<option value="">Seleccione...</option>';
+                dist.innerHTML = '<option value="">Seleccione...</option>';
+                
+                if(e.target.value) {
+                    ["Provincia Alfa", "Provincia Beta"].forEach(p => {
+                        prov.innerHTML += `<option value="${p}">${p}</option>`;
+                    });
+                }
+            });
+
+            document.getElementById('provincia').addEventListener('change', (e) => {
+                const dist = document.getElementById('distrito');
+                dist.innerHTML = '<option value="">Seleccione...</option>';
+                if(e.target.value) {
+                    ["Distrito Centro 1", "Distrito Periferia 2"].forEach(d => {
+                        dist.innerHTML += `<option value="${d}">${d}</option>`;
+                    });
+                }
+            });
+
+            // Cambiar polígonos de ANPs según categoría ambiental
+            document.getElementById('capaAmbiental').addEventListener('change', (e) => {
+                const nombreArea = document.getElementById('nombreArea');
+                nombreArea.innerHTML = '<option value="">Seleccione Polígono...</option>';
+                if(e.target.value && anpsPeru[e.target.value]) {
+                    nombreArea.disabled = false;
+                    anpsPeru[e.target.value].forEach(area => {
+                        nombreArea.innerHTML += `<option value="${area}">${area}</option>`;
+                    });
+                } else {
+                    nombreArea.disabled = true;
+                }
+            });
+
+            // Botón Reset / Limpiar
+            document.getElementById('limpiar').addEventListener('click', () => {
+                document.getElementById('resArea').innerText = "--.--- km²";
+                document.getElementById('resProm').innerText = "-,---";
+                document.getElementById('resMax').innerText = "-,---";
+                document.getElementById('resMin').innerText = "-,---";
+                if(currentMarker) map.removeLayer(currentMarker);
+                map.setView([-9.19, -75.015], 6);
+            });
+
+            // Botón Procesar / Consultar (Ejecutar Script)
+            document.getElementById('consultar').addEventListener('click', () => {
+                // Activar Telemetría HUD en pantalla
+                const sat = document.getElementById('satelite').value;
+                const ind = document.getElementById('indice').value;
+                const aFin = document.getElementById('anioFinal').value;
+
+                document.getElementById('sensor').innerText = sat;
+                document.getElementById('indiceNombre').innerText = ind + " Core Analysis";
+                document.getElementById('anio').innerText = "Mediana " + aFin;
+
+                // Generar Números Simulados Coherentes
+                const areaRandom = (Math.random() * 50 + 5).toFixed(2);
+                const meanRandom = (Math.random() * 0.6 + 0.1).toFixed(3);
+                const maxRandom = (Math.random() * 0.3 + 0.6).toFixed(3);
+                const minRandom = (Math.random() * 0.2 - 0.1).toFixed(3);
+
+                document.getElementById('resArea').innerText = areaRandom + " km²";
+                document.getElementById('resProm').innerText = meanRandom;
+                document.getElementById('resMax').innerText = maxRandom;
+                document.getElementById('resMin').innerText = minRandom;
+
+                // Crear un punto aleatorio en el mapa dentro del territorio de Perú
+                if(currentMarker) map.removeLayer(currentMarker);
+                const latRandom = -6.0 - (Math.random() * 6);
+                const lngRandom = -74.0 - (Math.random() * 4);
+                
+                // Dibujar un recuadro de escaneo táctico (Bounding box simulado)
+                currentMarker = L.rectangle([
+                    [latRandom - 0.05, lngRandom - 0.05],
+                    [latRandom + 0.05, lngRandom + 0.05]
+                ], {color: "#10b981", weight: 2, fillColor: "#10b981", fillOpacity: 0.15}).addTo(map);
+                
+                map.setView([latRandom, lngRandom], 12);
+
+                // Agregar registro a la consola táctica de operaciones (Sección 06)
+                let objetivoNombre = document.getElementById('tipoConsulta').value === 'politico' ? 
+                    (document.getElementById('departamento').value || "Región Clave") : 
+                    (document.getElementById('nombreArea').value || "ANP Protegida");
+
+                const tabla = document.getElementById('tablaResultados');
+                const nuevaFila = `<tr>
+                    <td>${objetivoNombre}</td>
+                    <td><span style="color: var(--accent-purple)">${ind}</span></td>
+                    <td>${aFin}</td>
+                    <td>${sat.split(' ')[0]}</td>
+                    <td>${areaRandom}</td>
+                </tr>`;
+                tabla.innerHTML = nuevaFila + tabla.innerHTML;
+
+                // Actualizar los gráficos analíticos
+                updateChartsData();
+                alert("Motor Earth Engine: ¡Script Ejecutado con Éxito!");
+            });
+        }
+
+        // 4. Sistema Táctico de Pestañas
+        window.switchTab = function(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             
             document.getElementById('tab-' + tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
+            document.getElementById('btn-tab-' + tabId).classList.add('active');
             
             if(tabId === 'mapa') {
-                setTimeout(() => { if (typeof map !== 'undefined') map.invalidateSize(); }, 250);
+                setTimeout(() => { if (map) map.invalidateSize(); }, 50);
             }
+        };
+
+        // 5. Inicializar Gráficos de Chart.js
+        function initCharts() {
+            const ctxHisto = document.getElementById('chartHistograma').getContext('2d');
+            histogramChart = new Chart(ctxHisto, {
+                type: 'bar',
+                data: {
+                    labels: ['-0.2', '0.0', '0.2', '0.4', '0.6', '0.8'],
+                    datasets: [{
+                        label: 'Frecuencia de Pixeles',
+                        data: [120, 450, 1200, 3100, 1800, 600],
+                        backgroundColor: '#2563eb'
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+            });
+
+            const ctxClases = document.getElementById('chartClases').getContext('2d');
+            classesChart = new Chart(ctxClases, {
+                type: 'line',
+                data: {
+                    labels: ['2020', '2021', '2022', '2023', '2024', '2026'],
+                    datasets: [{
+                        label: 'Tendencia Media Espectral',
+                        data: [0.42, 0.45, 0.41, 0.48, 0.53, 0.51],
+                        borderColor: '#10b981',
+                        tension: 0.3,
+                        fill: false
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
         }
-        // Desvanecimiento del Loader una vez cargado el DOM
-        window.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                const loader = document.getElementById('loader');
-                if(loader) loader.style.opacity = '0';
-                setTimeout(() => loader.remove(), 400);
-            }, 1200);
-        });
+
+        // Cambiar dinámicamente los gráficos al ejecutar scripts
+        function updateChartsData() {
+            if(!histogramChart || !classesChart) return;
+            
+            // Generar arrays aleatorios para simular cambios
+            histogramChart.data.datasets[0].data = Array.from({length: 6}, () => Math.floor(Math.random() * 4000));
+            histogramChart.update();
+
+            classesChart.data.datasets[0].data = Array.from({length: 6}, () => (Math.random() * 0.5 + 0.2));
+            classesChart.update();
+        }
     </script>
 </body>
 </html>
