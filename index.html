@@ -174,63 +174,66 @@
     <!-- CONTENEDOR DASHBOARD -->
     <div class="dashboard">
         
-        <div class="section-panel">
-            <div class="section-title">1. Enfoque Espacial de Consulta</div>
-            <div class="form-group">
-                <label for="tipoConsulta">Modalidad de Análisis</label>
-                <select id="tipoConsulta" class="form-control">
+        <!-- SIDEBAR IZQUIERDO: FILTROS -->
+        <aside class="panel">
+            <div class="panel-h1">⚙️ Configuración de Análisis</div>
+            
+            <div class="section-lbl">1. Enfoque Espacial de Consulta</div>
+            <div class="form-unit">
+                <label>Modalidad de Análisis</label>
+                <select id="modalidad" class="select-field">
                     <option value="politico">División Político-Administrativa</option>
-                    <option value="conservacion">Áreas Naturales y Conservación (ANPs)</option>
+                    <option value="ambiental">Áreas Naturales y Conservación (ANPs)</option>
                 </select>
             </div>
-        </div>
 
-        <div class="section-panel">
-            <div class="section-title">2. Límites Cartográficos</div>
+            <div class="section-lbl">2. Límites Cartográficos</div>
             
-            <div id="grupoPolitico">
-                <div class="form-group">
-                    <label for="departamento">Departamento</label>
-                    <select id="departamento" class="form-control">
-                        <option value="Seleccione...">Cargando...</option>
+            <!-- Grupo Político -->
+            <div id="wrapperPolitico">
+                <div class="form-unit" style="margin-bottom: 5px;">
+                    <label>Departamento</label>
+                    <select id="depSelect" class="select-field">
+                        <option value="Apurímac">Apurímac</option>
+                        <option value="Cusco">Cusco</option>
+                        <option value="Lima">Lima</option>
                     </select>
                 </div>
-                <div class="row-grid">
-                    <div class="form-group">
-                        <label for="provincia">Provincia</label>
-                        <select id="provincia" class="form-control">
-                            <option value="Seleccione...">Seleccione...</option>
+                <div class="grid-2">
+                    <div class="form-unit">
+                        <label>Provincia</label>
+                        <select id="provSelect" class="select-field">
+                            <option value="Andahuaylas">Andahuaylas</option>
+                            <option value="Abancay">Abancay</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label for="distrito">Distrito</label>
-                        <select id="distrito" class="form-control">
-                            <option value="Seleccione...">Seleccione...</option>
+                    <div class="form-unit">
+                        <label>Distrito</label>
+                        <select id="distSelect" class="select-field">
+                            <option value="San Antonio de Cachi">San Antonio de Cachi</option>
+                            <option value="Kishuara">Kishuara</option>
                         </select>
                     </div>
                 </div>
             </div>
 
-            <div id="grupoAmbiental" style="display: none;">
-                <div class="form-group">
-                    <label for="capaAmbiental">Categoría de Conservación</label>
-                    <select id="capaAmbiental" class="form-control">
-                        <option value="Seleccione...">Seleccione...</option>
-                        <option value="anpdefinitivas">ANP Administración Nacional</option>
-                        <option value="acr">Áreas de Conservación Regional (ACR)</option>
-                        <option value="acp">Áreas de Conservación Privada (ACP)</option>
-                        <option value="zona_reservada">Zonas Reservadas</option>
-                        <option value="zona_de_amortiguamiento">Zonas de Amortiguamiento</option>
+            <!-- Grupo Ambiental -->
+            <div id="wrapperAmbiental" style="display: none;">
+                <div class="form-unit" style="margin-bottom: 5px;">
+                    <label>Categoría</label>
+                    <select id="envCatSelect" class="select-field">
+                        <option value="ACP">Áreas de Conservación Privada (ACP)</option>
+                        <option value="ANP">Parques Nacionales (SERNANP)</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label for="nombreArea">Área de Estudio Específica</label>
-                    <select id="nombreArea" class="form-control" disabled>
-                        <option value="Seleccione...">Seleccione una categoría primero...</option>
+                <div class="form-unit">
+                    <label>Área de Estudio Específica</label>
+                    <select id="envAreaSelect" class="select-field">
+                        <option value="BOSQUE NATURAL EL CAÑONCILLO">BOSQUE NATURAL EL CAÑONCILLO</option>
+                        <option value="PACAYA SAMIRIA">RESERVA PACAYA SAMIRIA</option>
                     </select>
                 </div>
             </div>
-        </div>
 
             <div class="section-lbl">3. Parámetros de Misión</div>
             <div class="form-unit">
