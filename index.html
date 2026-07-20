@@ -3,599 +3,924 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GEOSPATIAL PERÚ - Plataforma de Análisis Satelital</title>
+    <title>GeoSpatial Perú - Plataforma de Análisis Satelital</title>
     
     <!-- Dependencias GIS y Gráficos -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
-        :root {
-            --bg-body: #f1f5f9;
-            --bg-card: #ffffff;
-            --border-color: #e2e8f0;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --primary-blue: #2563eb;
-            --primary-hover: #1d4ed8;
-            --accent-green: #15803d;
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
         }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            font-size: 11px;
+        
+        body { 
+            display: flex; 
             width: 100vw;
+            height: 100vh; 
+            overflow: hidden;
+            background-color: #f4f6f9; 
+            color: #333; 
+        }
+        
+        /* Sidebar (Panel de Control Izquierdo) */
+        #sidebar { 
+            width: 400px; 
+            min-width: 400px;
             height: 100vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            background: #ffffff; 
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1); 
+            display: flex; 
+            flex-direction: column; 
+            z-index: 1000; 
+            overflow-y: auto; 
         }
-
-        /* --- HEADER --- */
-        header {
-            background: var(--bg-card);
-            border-bottom: 1px solid var(--border-color);
-            height: 48px;
-            padding: 0 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-shrink: 0;
+        
+        .brand-header { 
+            padding: 20px; 
+            background: #2c3e50; 
+            color: #fff; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
         }
-        .brand { display: flex; align-items: center; gap: 8px; }
-        .brand-title { font-weight: 800; font-size: 13px; letter-spacing: -0.3px; }
-        .brand-sub { font-size: 9px; color: var(--text-muted); font-weight: 500; }
         
-        .nav-tabs { display: flex; list-style: none; gap: 4px; height: 100%; align-items: center; }
-        .nav-tabs a { text-decoration: none; color: #475569; font-weight: 600; padding: 6px 12px; border-radius: 4px; }
-        .nav-tabs a.active { background: #eff6ff; color: var(--primary-blue); }
-        
-        .user-tag { display: flex; align-items: center; gap: 8px; font-size: 10px; }
-        .avatar { width: 26px; height: 26px; background: #cbd5e1; border-radius: 50%; }
-
-        /* --- DASHBOARD LAYOUT (3 COLUMNAS EXACTAS) --- */
-        .dashboard {
-            display: grid;
-            grid-template-columns: 290px 1fr 280px;
-            gap: 10px;
-            padding: 10px;
-            height: calc(100vh - 48px);
-            overflow: hidden;
+        .brand-header h2 { 
+            font-size: 1.2rem; 
+            font-weight: 600; 
+            letter-spacing: 0.5px; 
         }
-
-        /* Paneles Laterales Estilo Limpio */
-        .panel {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            overflow-y: auto;
+        
+        .section-panel { 
+            padding: 15px 20px; 
+            border-bottom: 1px solid #eef2f5; 
         }
-
-        .panel-h1 { font-size: 10.5px; font-weight: 700; text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding-bottom: 4px; color: #1e293b; }
-        .section-lbl { font-weight: 700; color: #475569; font-size: 9.5px; margin-top: 4px; text-transform: capitalize; }
         
-        .form-unit { display: flex; flex-direction: column; gap: 3px; }
-        .form-unit label { font-size: 9.5px; color: #475569; font-weight: 500; }
-        .select-field { width: 100%; padding: 5px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 11px; background: #f8fafc; outline: none; }
+        .section-title { 
+            font-size: 0.85rem; 
+            font-weight: 700; 
+            color: #7f8c8d; 
+            text-transform: uppercase; 
+            margin-bottom: 12px; 
+            letter-spacing: 0.5px; 
+        }
         
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-
-        /* Botonera */
-        .action-block { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
-        .btn { padding: 8px; border: none; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; text-align: center; }
-        .btn-danger { background: #ef4444; color: white; }
-        .btn-apply { background: var(--primary-blue); color: white; }
-
-        /* --- COLUMNA CENTRAL --- */
-        .center-space { display: flex; flex-direction: column; gap: 10px; overflow: hidden; }
+        .form-group { 
+            margin-bottom: 12px; 
+        }
+        
+        .form-group label { 
+            display: block; 
+            font-size: 0.85rem; 
+            font-weight: 600; 
+            color: #34495e; 
+            margin-bottom: 6px; 
+        }
+        
+        .form-control { 
+            width: 100%; 
+            padding: 8px 10px; 
+            border: 1px solid #dcdde1; 
+            border-radius: 6px; 
+            font-size: 0.9rem; 
+            color: #2c3e50; 
+            background-color: #fcfcfc; 
+            transition: all 0.3s ease; 
+        }
+        
+        .form-control:focus { 
+            border-color: #3498db; 
+            outline: none; 
+            background-color: #fff; 
+            box-shadow: 0 0 0 3px rgba(52,152,219,0.15); 
+        }
+        
+        .form-control:disabled { 
+            background-color: #f1f2f6; 
+            color: #7f8c8d; 
+            cursor: not-allowed; 
+        }
+        
+        .row-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 12px; 
+        }
+        
+        .btn-container { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 12px; 
+            padding: 20px; 
+            background: #f8f9fa; 
+        }
+        
+        .btn { 
+            padding: 12px; 
+            border: none; 
+            border-radius: 6px; 
+            font-size: 0.9rem; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.2s ease; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 8px; 
+        }
+        
+        .btn-primary { background: #3498db; color: #fff; }
+        .btn-primary:hover { background: #2980b9; }
+        
+        .btn-secondary { background: #e74c3c; color: #fff; }
+        .btn-secondary:hover { background: #c0392b; }
+        
+        /* Modificación para albergar Gráficos en Sidebar */
+        .charts-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 12px; 
+            margin-top: 5px;
+        }
+        
+        .chart-holder { 
+            background: #fff; 
+            border: 1px solid #e2e8f0; 
+            border-radius: 6px; 
+            padding: 8px; 
+        }
+        
+        .chart-holder-title { 
+            font-weight: 700; 
+            font-size: 9px; 
+            color: #475569; 
+            margin-bottom: 6px; 
+            text-transform: uppercase; 
+        }
+        
+        .canvas-container { 
+            height: 100px; 
+            position: relative; 
+        }
+        
+        .ui-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            font-size: 9px; 
+            text-align: left; 
+            margin-top: 5px; 
+        }
+        
+        .ui-table th { 
+            background: #f8fafc; 
+            padding: 4px 6px; 
+            font-weight: 700; 
+            border-bottom: 1px solid #e2e8f0; 
+        }
+        
+        .ui-table td { 
+            padding: 4px 6px; 
+            border-bottom: 1px solid #f1f5f9; 
+        }
+        
+        .color-dot { 
+            display: inline-block; 
+            width: 8px; 
+            height: 8px; 
+            border-radius: 2px; 
+            margin-right: 5px; 
+        }
         
         /* Contenedor del Mapa */
-        .map-box { height: 42%; border: 1px solid var(--border-color); border-radius: 6px; background: #fff; overflow: hidden; position: relative; }
-        .map-header-tabs { display: flex; background: #f8fafc; border-bottom: 1px solid var(--border-color); padding: 4px 8px; gap: 4px; }
-        .inner-tab { padding: 4px 10px; font-size: 10px; font-weight: 600; border-radius: 4px; cursor: pointer; background: #fff; border: 1px solid var(--border-color); }
-        .inner-tab.active { background: var(--primary-blue); color: white; border-color: var(--primary-blue); }
+        #map-container { 
+            flex: 1; 
+            height: 100vh;
+            position: relative; 
+            display: flex; 
+            flex-direction: column; 
+        }
         
-        #map { width: 100%; height: calc(100% - 27px); z-index: 1; }
-
-        /* Overlays Flotantes del Mapa */
-        .gee-badge { position: absolute; top: 38px; left: 10px; background: rgba(255,255,255,0.95); padding: 8px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); z-index: 1000; font-size: 9.5px; width: 160px; border-left: 3px solid #06b6d4; }
-        .gee-badge p { display: flex; justify-content: space-between; margin-top: 2px; }
+        #map { 
+            flex: 1; 
+            width: 100%; 
+            height: 100%; 
+        }
         
-        .map-legend { position: absolute; bottom: 10px; right: 10px; background: rgba(255,255,255,0.95); padding: 6px 10px; border-radius: 4px; z-index: 1000; border: 1px solid var(--border-color); font-size: 9.5px; }
-        .legend-row { display: flex; align-items: center; gap: 6px; margin-top: 3px; }
-        .color-dot { width: 10px; height: 10px; border-radius: 2px; }
-
-        /* Fila de Métricas Cajas Blancas */
-        .metrics-bar { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; }
-        .m-card { background: #fff; border: 1px solid var(--border-color); border-radius: 4px; padding: 6px 2px; text-align: center; }
-        .m-title { font-size: 8px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
-        .m-val { font-size: 11px; font-weight: 700; margin-top: 2px; }
-
-        /* Grid de Gráficos (Mitad Inferior) */
-        .charts-row-1 { display: grid; grid-template-columns: 1.1fr 1.1fr 0.9fr 0.9fr; gap: 10px; height: 24%; min-height: 0; }
-        .charts-row-2 { display: grid; grid-template-columns: 1.6fr 1.4fr; gap: 10px; height: 23%; min-height: 0; }
+        /* Overlays flotantes */
+        .info-overlay { 
+            position: absolute; 
+            top: 20px; 
+            left: 20px; 
+            background: rgba(255,255,255,0.95); 
+            padding: 15px 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15); 
+            z-index: 1000; 
+            border-left: 4px solid #06b6d4; 
+            min-width: 220px; 
+        }
         
-        .chart-holder { background: #fff; border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; display: flex; flex-direction: column; min-height: 0; }
-        .chart-holder-title { font-weight: 700; font-size: 9px; color: #475569; margin-bottom: 4px; text-transform: uppercase; }
-        .canvas-container { flex: 1; position: relative; min-height: 0; }
-        .canvas-container canvas { position: absolute; top:0; left:0; width:100% !important; height:100% !important; }
+        .info-overlay h4 { 
+            font-size: 0.95rem; 
+            margin-bottom: 8px; 
+            color: #2c3e50; 
+            font-weight: 700; 
+        }
+        
+        .info-overlay p { 
+            font-size: 0.85rem; 
+            color: #555; 
+            margin-bottom: 4px; 
+            display: flex; 
+            justify-content: space-between; 
+        }
+        
+        .info-overlay span { 
+            font-weight: 600; 
+            color: #2c3e50; 
+        }
+        
+        .toolbar-right { 
+            position: absolute; 
+            top: 20px; 
+            right: 20px; 
+            z-index: 1000; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+        }
+        
+        .toolbar-btn { 
+            width: 40px; 
+            height: 40px; 
+            background: #fff; 
+            border: none; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 1.2rem; 
+            color: #2c3e50; 
+            transition: all 0.2s; 
+        }
+        
+        .dashboard-results { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 15px; 
+            padding: 15px 20px; 
+            background: #fff; 
+            border-top: 1px solid #eef2f5; 
+            z-index: 999; 
+        }
+        
+        .result-card { 
+            background: #f8f9fa; 
+            padding: 12px; 
+            border-radius: 8px; 
+            border: 1px solid #eef2f5; 
+        }
+        
+        .result-card p { 
+            font-size: 0.72rem; 
+            font-weight: 700; 
+            color: #7f8c8d; 
+            text-transform: uppercase; 
+            margin-bottom: 4px; 
+        }
+        
+        .result-card h1 { 
+            font-size: 1.3rem; 
+            color: #2c3e50; 
+            font-weight: 600; 
+        }
+        
+        .container-descargas { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 8px; 
+        }
+        
+        .btn-download { 
+            padding: 6px; 
+            font-size: 0.75rem; 
+            border: 1px solid #dcdde1; 
+            background: #fff; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            color: #555; 
+            text-align: center;
+        }
 
-        /* Tablas de Datos */
-        .table-wrap { flex: 1; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 4px; background: #fff; }
-        .ui-table { width: 100%; border-collapse: collapse; font-size: 10px; text-align: left; }
-        .ui-table th { position: sticky; top: 0; background: #f8fafc; padding: 4px 6px; font-weight: 700; border-bottom: 1px solid var(--border-color); }
-        .ui-table td { padding: 4px 6px; border-bottom: 1px solid #f1f5f9; }
-
-        .descargas-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
-        .btn-dl { padding: 5px 2px; font-size: 9.5px; border: 1px solid #cbd5e1; background: #fff; border-radius: 4px; cursor: pointer; font-weight: 600; text-align: center; }
+        #loader { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh; 
+            background: rgba(44, 62, 80, 0.95); 
+            z-index: 9999; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            color: white; 
+            font-size: 1.2rem;
+            transition: opacity 0.5s ease;
+        }
+        
+        .spinner { 
+            width: 40px; 
+            height: 40px; 
+            border: 4px solid #f3f3f3; 
+            border-top: 4px solid #3498db; 
+            border-radius: 50%; 
+            animation: spin 1s linear infinite; 
+            margin-bottom: 15px; 
+        }
+        
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
     </style>
 </head>
 <body>
 
-    <!-- NAVBAR SUPERIOR -->
-    <header>
-        <div class="brand">
-            <div style="font-size:16px; color: var(--primary-blue);">🌍</div>
-            <div>
-                <div class="brand-title">GEOSPATIAL PERÚ</div>
-                <div class="brand-sub">Plataforma de Análisis Satelital</div>
-            </div>
-        </div>
-        <nav>
-            <ul class="nav-tabs">
-                <li><a href="#">Inicio</a></li>
-                <li><a href="#" class="active">Mapa</a></li>
-                <li><a href="#">Análisis</a></li>
-                <li><a href="#">Reportes</a></li>
-                <li><a href="#">Descargas</a></li>
-            </ul>
-        </nav>
-        <div class="user-tag">
-            <div style="text-align: right">
-                <div style="font-weight:700;">Alessandro Ahualla</div>
-                <div style="font-size:8.5px; color:var(--text-muted)">Investigador</div>
-            </div>
-            <div class="avatar"></div>
-        </div>
-    </header>
+    <div id="loader">
+        <div class="spinner"></div>
+        <p id="loaderTxt">Inicializando recursos GIS...</p>
+    </div>
 
-    <!-- CONTENEDOR DASHBOARD -->
-    <div class="dashboard">
-        
-        <!-- SIDEBAR IZQUIERDO: FILTROS -->
-        <aside class="panel">
-            <div class="panel-h1">⚙️ Configuración de Análisis</div>
-            
-            <div class="section-lbl">1. Enfoque Espacial de Consulta</div>
-            <div class="form-unit">
-                <label>Modalidad de Análisis</label>
-                <select id="modalidad" class="select-field">
+    <div id="sidebar">
+        <div class="brand-header">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            <h2>GEOSPATIAL PERÚ</h2>
+        </div>
+
+        <!-- 1. ENFOQUE ESPACIAL -->
+        <div class="section-panel">
+            <div class="section-title">1. Enfoque Espacial de Consulta</div>
+            <div class="form-group">
+                <label for="tipoConsulta">Modalidad de Análisis</label>
+                <select id="tipoConsulta" class="form-control">
                     <option value="politico">División Político-Administrativa</option>
-                    <option value="ambiental">Áreas Naturales y Conservación (ANPs)</option>
+                    <option value="conservacion">Áreas Naturales y Conservación (ANPs)</option>
                 </select>
             </div>
+        </div>
 
-            <div class="section-lbl">2. Límites Cartográficos</div>
+        <!-- 2. LÍMITES CARTOGRÁFICOS -->
+        <div class="section-panel">
+            <div class="section-title">2. Límites Cartográficos</div>
             
-            <!-- Grupo Político -->
-            <div id="wrapperPolitico">
-                <div class="form-unit" style="margin-bottom: 5px;">
-                    <label>Departamento</label>
-                    <select id="depSelect" class="select-field">
-                        <option value="Apurímac">Apurímac</option>
-                        <option value="Cusco">Cusco</option>
-                        <option value="Lima">Lima</option>
+            <div id="grupoPolitico">
+                <div class="form-group">
+                    <label for="departamento">Departamento</label>
+                    <select id="departamento" class="form-control">
+                        <option value="Seleccione...">Cargando...</option>
                     </select>
                 </div>
-                <div class="grid-2">
-                    <div class="form-unit">
-                        <label>Provincia</label>
-                        <select id="provSelect" class="select-field">
-                            <option value="Andahuaylas">Andahuaylas</option>
-                            <option value="Abancay">Abancay</option>
+                <div class="row-grid">
+                    <div class="form-group">
+                        <label for="provincia">Provincia</label>
+                        <select id="provincia" class="form-control">
+                            <option value="Seleccione...">Seleccione...</option>
                         </select>
                     </div>
-                    <div class="form-unit">
-                        <label>Distrito</label>
-                        <select id="distSelect" class="select-field">
-                            <option value="San Antonio de Cachi">San Antonio de Cachi</option>
-                            <option value="Kishuara">Kishuara</option>
+                    <div class="form-group">
+                        <label for="distrito">Distrito</label>
+                        <select id="distrito" class="form-control">
+                            <option value="Seleccione...">Seleccione...</option>
                         </select>
                     </div>
                 </div>
             </div>
 
-            <!-- Grupo Ambiental -->
-            <div id="wrapperAmbiental" style="display: none;">
-                <div class="form-unit" style="margin-bottom: 5px;">
-                    <label>Categoría</label>
-                    <select id="envCatSelect" class="select-field">
-                        <option value="ACP">Áreas de Conservación Privada (ACP)</option>
-                        <option value="ANP">Parques Nacionales (SERNANP)</option>
+            <div id="grupoAmbiental" style="display: none;">
+                <div class="form-group">
+                    <label for="capaAmbiental">Categoría de Conservación</label>
+                    <select id="capaAmbiental" class="form-control">
+                        <option value="Seleccione...">Seleccione...</option>
+                        <option value="anpdefinitivas">ANP Administración Nacional</option>
+                        <option value="acr">Áreas de Conservación Regional (ACR)</option>
+                        <option value="acp">Áreas de Conservación Privada (ACP)</option>
+                        <option value="zona_reservada">Zonas Reservadas</option>
+                        <option value="zona_de_amortiguamiento">Zonas de Amortiguamiento</option>
                     </select>
                 </div>
-                <div class="form-unit">
-                    <label>Área de Estudio Específica</label>
-                    <select id="envAreaSelect" class="select-field">
-                        <option value="BOSQUE NATURAL EL CAÑONCILLO">BOSQUE NATURAL EL CAÑONCILLO</option>
-                        <option value="PACAYA SAMIRIA">RESERVA PACAYA SAMIRIA</option>
+                <div class="form-group">
+                    <label for="nombreArea">Área de Estudio Específica</label>
+                    <select id="nombreArea" class="form-control" disabled>
+                        <option value="Seleccione...">Seleccione una categoría primero...</option>
                     </select>
                 </div>
             </div>
+        </div>
 
-            <div class="section-lbl">3. Parámetros de Misión</div>
-            <div class="form-unit">
-                <label>Sensor Satelital</label>
-                <select id="sensorSelect" class="select-field">
+        <!-- 3. PARÁMETROS DE MISIÓN -->
+        <div class="section-panel">
+            <div class="section-title">3. Parámetros de Misión</div>
+            <div class="form-group">
+                <label for="satelite">Sensor Satelital</label>
+                <select id="satelite" class="form-control">
                     <option value="Landsat 5">Landsat 5 (TM) [1984 - 2011]</option>
+                    <option value="Landsat 7">Landsat 7 (ETM+) [1999 - 2021]</option>
                     <option value="Landsat 8">Landsat 8 (OLI) [2013 - Act]</option>
-                    <option value="Sentinel-2">Sentinel-2 (MSI) [2015 - Act]</option>
+                    <option value="Landsat 9">Landsat 9 (OLI-2) [2021 - Act]</option>
+                    <option value="Sentinel 2">Sentinel 2 (MSI) [2015 - Act]</option>
                 </select>
             </div>
-            <div class="form-unit">
-                <label>Índice Espectral</label>
-                <select id="idxSelect" class="select-field">
-                    <option value="NDVI">NDVI (Vegetación)</option>
-                    <option value="NDWI">NDWI (Estrés Hídrico)</option>
-                    <option value="NBR">NBR (Áreas Quemadas)</option>
+            <div class="form-group">
+                <label for="objetivo">Objetivo del Estudio</label>
+                <select id="objetivo" class="form-control">
+                    <option value="Vegetación">Análisis de Vegetación</option>
+                    <option value="Agua">Recursos Hídricos y Humedad</option>
+                    <option value="Área Glacial">Zonas Criogénicas y Glaciares</option>
+                    <option value="Temperatura">Temperatura Superficial (LST)</option>
+                    <option value="Suelo">Geomorfología y Suelo Expuesto</option>
+                    <option value="Área Urbana">Expansión Urbana e Infraestructura</option>
+                    <option value="Incendios y Antropización">Incendios y Antropización</option>
                 </select>
             </div>
+            <div class="form-group">
+                <label for="indice">Índice Espectral</label>
+                <select id="indice" class="form-control">
+                    <!-- Inyectado dinámicamente -->
+                </select>
+            </div>
+        </div>
 
-            <div class="section-lbl">4. Temporalidad Análisis</div>
-            <div class="grid-2">
-                <div class="form-unit">
-                    <label>Año Inicial</label>
-                    <select id="yearSrc" class="select-field"></select>
+        <!-- 4. TEMPORALIDAD -->
+        <div class="section-panel">
+            <div class="section-title">4. Temporalidad Análisis</div>
+            <div class="row-grid">
+                <div class="form-group">
+                    <label for="anioInicio">Año Inicial</label>
+                    <select id="anioInicio" class="form-control"></select>
                 </div>
-                <div class="form-unit">
-                    <label>Año Final</label>
-                    <select id="yearEnd" class="select-field"></select>
+                <div class="form-group">
+                    <label for="anioFinal">Año Final</label>
+                    <select id="anioFinal" class="form-control"></select>
                 </div>
             </div>
+        </div>
 
-            <div class="section-lbl">5. Exportación Científica</div>
-            <div class="descargas-grid">
-                <button class="btn-dl" onclick="alert('Exportando GeoTIFF...')">💾 GeoTIFF</button>
-                <button class="btn-dl" style="color:var(--text-muted); cursor:not-allowed;">📦 SHP</button>
-                <button class="btn-dl" onclick="alert('Descargando captura PNG...')">📸 PNG</button>
-                <button class="btn-dl" style="color:var(--text-muted); cursor:not-allowed;">📄 PDF</button>
-            </div>
-
-            <div class="action-block">
-                <button id="clearBtn" class="btn btn-danger">Limpiar</button>
-                <button id="runBtn" class="btn btn-apply">Consultar</button>
-            </div>
-
-            <div class="panel-h1" style="margin-top:4px;">📜 6. Historial de Consultas</div>
-            <div class="table-wrap" style="max-height: 90px;">
-                <table class="ui-table">
-                    <thead>
-                        <tr><th>Región/Área</th><th>Especificación</th><th>Índ.</th><th>Año</th></tr>
-                    </thead>
-                    <tbody id="historyRows"></tbody>
-                </table>
-            </div>
-        </aside>
-
-        <!-- COLUMNA CENTRAL: VISOR Y ESTADÍSTICAS -->
-        <main class="center-space">
+        <!-- CIENTÍFICO: FORMULA Y LEYENDA -->
+        <div class="section-panel" style="background: #fafafa;">
+            <div class="section-title">ℹ️ Información Científica del Índice</div>
+            <div id="lblFormula" style="font-family:monospace; font-weight:700; color:#2563eb; font-size: 11px; margin-bottom: 4px;">Fórmula: (NIR - RED) / (NIR + RED)</div>
+            <p id="lblFormulaDesc" style="color:#64748b; font-size:11px; margin-bottom: 8px;">Indica el vigor fotosintético de la superficie vegetal analizada.</p>
             
-            <!-- Bloque Mapa -->
-            <div class="map-box">
-                <div class="map-header-tabs">
-                    <div class="inner-tab active">Mapa</div>
-                    <div class="inner-tab">Gráfico Temporal</div>
-                    <div class="inner-tab">Análisis Estadístico</div>
-                </div>
-                <div id="map"></div>
-
-                <div class="gee-badge">
-                    <div style="font-weight:700; margin-bottom:2px;">Capa Activa GEE</div>
-                    <p>Índice: <span id="geeIdx" style="font-weight:700">NDVI</span></p>
-                    <p>Sensor: <span id="geeSens" style="font-weight:700">Landsat 5</span></p>
-                    <p>Ventana: <span id="geeYear" style="font-weight:700">2010</span></p>
-                </div>
-
-                <div class="map-legend">
-                    <div id="legTitle" style="font-weight:700; font-size:8.5px; text-transform:uppercase;">LEYENDA NDVI</div>
-                    <div id="legItems">
-                        <div class="legend-row"><span class="color-dot" style="background:#15803d;"></span>Veg. Alta</div>
-                        <div class="legend-row"><span class="color-dot" style="background:#ea580c;"></span>Suelo Desnudo</div>
-                    </div>
-                </div>
+            <div style="font-weight: bold; font-size: 10px; margin-bottom: 4px;" id="legTitle">LEYENDA NDVI</div>
+            <div id="legItems" style="font-size: 10px; display: flex; gap: 10px;">
+                <div><span class="color-dot" style="background:#15803d;"></span>Veg. Alta</div>
+                <div><span class="color-dot" style="background:#ea580c;"></span>Suelo Desnudo</div>
             </div>
+        </div>
 
-            <!-- Fila de Tarjetas de Métricas -->
-            <div class="metrics-bar">
-                <div class="m-card"><div class="m-title">Área Estudio</div><div class="m-val" id="mArea">15.01 km²</div></div>
-                <div class="m-card"><div class="m-title">Valor Prom.</div><div class="m-val" id="mProm">0.064</div></div>
-                <div class="m-card"><div class="m-title">Valor Mediana</div><div class="m-val" id="mMed">0.671</div></div>
-                <div class="m-card"><div class="m-title">Desv. Estándar</div><div class="m-val" id="mDev">0.033</div></div>
-                <div class="m-card"><div class="m-title">Valor Mínimo</div><div class="m-val" id="mMin">-0.028</div></div>
-                <div class="m-card"><div class="m-title">Valor Máximo</div><div class="m-val" id="mMax">0.294</div></div>
-                <div class="m-card"><div class="m-title">Píxeles Tot.</div><div class="m-val" id="mPix">16,678</div></div>
-                <div class="m-card"><div class="m-title">Fecha Análisis</div><div class="m-val" style="color:var(--primary-blue)">20/07/2026</div></div>
-            </div>
-
-            <!-- Gráficos Fila 1 -->
-            <div class="charts-row-1">
+        <!-- CIENTÍFICO: GRÁFICOS ANALÍTICOS -->
+        <div class="section-panel">
+            <div class="section-title">Visualización Estadística</div>
+            <div class="charts-grid">
                 <div class="chart-holder">
-                    <div class="chart-holder-title" id="tDonut">Distribución Clases NDVI</div>
+                    <div class="chart-holder-title" id="tDonut">Clases</div>
                     <div class="canvas-container"><canvas id="cDonut"></canvas></div>
                 </div>
                 <div class="chart-holder">
-                    <div class="chart-holder-title" id="tHist">Histograma NDVI</div>
+                    <div class="chart-holder-title" id="tHist">Histograma</div>
                     <div class="canvas-container"><canvas id="cHist"></canvas></div>
                 </div>
                 <div class="chart-holder">
-                    <div class="chart-holder-title" id="tBox">Boxplot NDVI</div>
+                    <div class="chart-holder-title" id="tBox">Boxplot</div>
                     <div class="canvas-container"><canvas id="cBox"></canvas></div>
                 </div>
                 <div class="chart-holder">
-                    <div class="chart-holder-title">Estadísticas Descriptivas</div>
-                    <div style="display:flex; flex-direction:column; gap:6px; margin-top:4px;">
-                        <p style="display:flex; justify-content:between;"><span>Media:</span><b id="lblMedia">0.064</b></p>
-                        <p style="display:flex; justify-content:between;"><span>Mediana:</span><b id="lblMediana">0.276</b></p>
-                        <p style="display:flex; justify-content:between;"><span>Mínimo:</span><b id="lblMin">-0.028</b></p>
-                        <p style="display:flex; justify-content:between;"><span>Máximo:</span><b id="lblMax">0.294</b></p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Gráficos Fila 2 -->
-            <div class="charts-row-2">
-                <div class="chart-holder">
-                    <div class="chart-holder-title">Gráfico Temporal de Tendencias</div>
+                    <div class="chart-holder-title">Tendencia</div>
                     <div class="canvas-container"><canvas id="cTrend"></canvas></div>
                 </div>
-                <div class="chart-holder">
-                    <div class="chart-holder-title" id="tTable">Resumen Temporal NDVI</div>
-                    <div class="table-wrap">
-                        <table class="ui-table">
-                            <thead>
-                                <tr><th>Año</th><th>Promedio</th><th>Desv. Est</th><th>Imágenes</th></tr>
-                            </thead>
-                            <tbody id="temporalRows">
-                                <tr><td>2024</td><td>0.547</td><td>0.055</td><td>12</td></tr>
-                                <tr><td>2025</td><td>0.645</td><td>0.018</td><td>14</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
             </div>
+        </div>
 
-        </main>
+        <!-- CIENTÍFICO: CALIDAD Y ESCENAS -->
+        <div class="section-panel">
+            <div class="section-title">⭐ Calidad e Historial Temporal</div>
+            <p style="font-size: 11px; margin-bottom: 2px;">Cobertura Nubosa Promedio: <b id="lblNubes">8.7%</b></p>
+            <p style="font-size: 11px; margin-bottom: 6px;">Escenas Válidas GEE: <b id="lblEscenas">127</b></p>
+            
+            <div class="chart-holder-title" id="tTable" style="margin-top:8px;">Resumen Temporal</div>
+            <table class="ui-table">
+                <thead>
+                    <tr><th>Año</th><th>Promedio</th><th>Desv. Est</th><th>Imágenes</th></tr>
+                </thead>
+                <tbody id="temporalRows">
+                    <tr><td>2024</td><td>0.547</td><td>0.055</td><td>12</td></tr>
+                    <tr><td>2025</td><td>0.645</td><td>0.018</td><td>14</td></tr>
+                </tbody>
+            </table>
 
-        <!-- SIDEBAR DERECHO: CALIDAD Y METADATOS -->
-        <aside class="panel">
-            <div class="panel-h1">⭐ Calidad del Análisis</div>
-            <div style="background:#f8fafc; padding:8px; border-radius:4px; border:1px solid var(--border-color)">
-                <p>Cobertura Nubosa Promedio: <b id="lblNubes">8.7%</b></p>
-                <p>Escenas Válidas: <b id="lblEscenas">127</b></p>
-                <p style="color:var(--accent-green); font-weight:700; margin-top:3px;">Análisis EXCELENTE ⭐⭐⭐⭐⭐</p>
+            <div class="chart-holder-title" style="margin-top:10px;">🎬 Últimas Escenas Procesadas</div>
+            <table class="ui-table">
+                <thead>
+                    <tr><th>ID Escena</th><th>Nubes</th></tr>
+                </thead>
+                <tbody id="scenesRows">
+                    <tr><td>LT05_L1TP_006007_20100512</td><td>5.2%</td></tr>
+                    <tr><td>LC08_L1TP_006007_20230718</td><td>1.8%</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 5. EXPORTACIÓN -->
+        <div class="section-panel">
+            <div class="section-title">5. Exportación Científica</div>
+            <div class="container-descargas">
+                <button id="btnTiff" class="btn-download">💾 GeoTIFF</button>
+                <button id="btnShp" class="btn-download">📦 SHP</button>
+                <button id="btnPng" class="btn-download">📸 PNG</button>
+                <button id="btnPdf" class="btn-download">📄 PDF</button>
             </div>
+        </div>
 
-            <div class="panel-h1">🎬 Escenas Utilizadas</div>
-            <div class="table-wrap" style="height: 120px;">
-                <table class="ui-table">
-                    <thead>
-                        <tr><th>ID Escena</th><th>Nubes</th></tr>
-                    </thead>
-                    <tbody id="scenesRows">
-                        <tr><td>LT05_L1TP_006007_19940211</td><td>5.2%</td></tr>
-                        <tr><td>LT05_L1TP_066007_19990113</td><td>3.1%</td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="panel-h1">ℹ️ Información del Índice</div>
-            <div style="background:#f8fafc; padding:8px; border-radius:4px; border:1px solid var(--border-color)">
-                <div id="lblFormula" style="font-family:monospace; font-weight:700; color:var(--primary-blue)">Fórmula: (NIR - RED) / (NIR + RED)</div>
-                <p id="lblFormulaDesc" style="color:var(--text-muted); margin-top:4px; line-height:1.2;">Indica el vigor fotosintético de la superficie vegetal analizada.</p>
-            </div>
-        </aside>
-
+        <!-- ACCIONES -->
+        <div class="btn-container">
+            <button id="limpiar" class="btn btn-secondary">Limpiar</button>
+            <button id="consultar" class="btn btn-primary">Consultar</button>
+        </div>
     </div>
 
-    <!-- MOTOR LOGICO INTEGRADO -->
+    <!-- MAPA DERECHO Y DASHBOARD GLOBAL -->
+    <div id="map-container">
+        <div id="map"></div>
+        
+        <!-- Capa Activa GEE (Metadato flotante) -->
+        <div class="info-overlay">
+            <h4>Capa Activa GEE</h4>
+            <p>Índice Espectral: <span id="geeIdx">NDVI</span></p>
+            <p>Plataforma Sensor: <span id="sensor">Landsat 8</span></p>
+            <p>Rango Evaluado: <span id="anio">2023 - 2026</span></p>
+            <p style="margin-top:4px; border-top: 1px dashed #ccc; padding-top:4px;">Desv. Estándar: <span id="mDev">0.033</span></p>
+        </div>
+
+        <div class="toolbar-right">
+            <button class="toolbar-btn" title="Mapa Base OSM">🗺</button>
+            <button class="toolbar-btn" title="Geolocalización GPS">📍</button>
+            <button class="toolbar-btn" title="Pantalla Completa">📺</button>
+        </div>
+
+        <!-- Dashboard de Resultados Inferior -->
+        <div class="dashboard-results">
+            <div class="result-card">
+                <p>Área de Estudio</p>
+                <h1 id="resArea">145.2 km²</h1>
+            </div>
+            <div class="result-card">
+                <p>Valor Mediana</p>
+                <h1 id="resProm">0.671</h1>
+            </div>
+            <div class="result-card">
+                <p>Valor Máximo</p>
+                <h1 id="resMax">0.892</h1>
+            </div>
+            <div class="result-card">
+                <p>Valor Mínimo</p>
+                <h1 id="resMin">-0.054</h1>
+            </div>
+        </div>
+    </div>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- LÓGICA INTEGRADA -->
     <script>
-        let graphDonut, graphHist, graphBox, graphTrend;
-
-        // Inicializador Global
-        window.addEventListener('DOMContentLoaded', () => {
-            // Rellenar selectores de años dinámicos (1984 - 2026)
-            const ys = document.getElementById('yearSrc');
-            const ye = document.getElementById('yearEnd');
-            for(let i=1984; i<=2026; i++) {
-                ys.options[ys.options.length] = new Option(i, i);
-                ye.options[ye.options.length] = new Option(i, i);
+        // Data Mock de Ubigeo Peruano en caso falte el archivo js externo
+        const dataUbigeo = window.dataUbigeo || {
+            "LIMA": {
+                "LIMA": ["ANCON", "CHOSICA", "MIRAFLORES", "SAN ISIDRO"],
+                "CAÑETE": ["SAN VICENTE", "MALA", "ASIA"]
+            },
+            "ANCASH": {
+                "HUARAZ": ["HUARAZ", "INDEPENDENCIA"],
+                "SANTA": ["CHIMBOTE", "NUEVO CHIMBOTE"]
             }
-            ys.value = 2010; ye.value = 2026;
+        };
 
-            // Instanciar Gráficos Iniciales
-            instanciarGraficos(0.064, -0.028, 0.294);
-        });
+        const indicesPorObjetivo = {
+            "Vegetación": ["NDVI", "EVI", "SAVI", "MSAVI", "GNDVI", "GCI", "ARVI", "NDRE"],
+            "Agua": ["NDWI", "MNDWI", "NDMI", "LSWI"],
+            "Área Glacial": ["NDSI"],
+            "Temperatura": ["LST"],
+            "Suelo": ["BI", "BSI", "BAI"],
+            "Área Urbana": ["NDBI"],
+            "Incendios y Antropización": ["NBR", "CRI"]
+        };
 
-        // Toggle Dinámico de Enfoques de Búsqueda (Político vs Ambiental)
-        document.getElementById('modalidad').addEventListener('change', function() {
-            if(this.value === 'politico') {
-                document.getElementById('wrapperPolitico').style.display = 'block';
-                document.getElementById('wrapperAmbiental').style.display = 'none';
-            } else {
-                document.getElementById('wrapperPolitico').style.display = 'none';
-                document.getElementById('wrapperAmbiental').style.display = 'block';
-            }
-        });
+        const limitesSatelites = {
+            "Landsat 5": { min: 1984, max: 2011, def: 2010 },
+            "Landsat 7": { min: 1999, max: 2021, def: 2015 },
+            "Landsat 8": { min: 2013, max: 2026, def: 2020 },
+            "Landsat 9": { min: 2021, max: 2026, def: 2023 },
+            "Sentinel 2": { min: 2015, max: 2026, def: 2022 }
+        };
 
-        // Reacción al cambio de Índice (Textos, fórmulas y Leyendas)
-        document.getElementById('idxSelect').addEventListener('change', function() {
-            const idx = this.value;
-            document.getElementById('geeIdx').innerText = idx;
-            document.getElementById('legTitle').innerText = `LEYENDA ${idx}`;
-            document.getElementById('tDonut').innerText = `Distribución Clases ${idx}`;
-            document.getElementById('tHist').innerText = `Histograma ${idx}`;
-            document.getElementById('tBox').innerText = `Boxplot ${idx}`;
-            document.getElementById('tTable').innerText = `Resumen Temporal ${idx}`;
+        const BASE_URL_API_REAL = "https://geovisor-uwu.onrender.com";
 
-            const f = document.getElementById('lblFormula');
-            const fd = document.getElementById('lblFormulaDesc');
-            const leg = document.getElementById('legItems');
+        // Referencias DOM
+        const tipoConsulta = document.getElementById("tipoConsulta");
+        const grupoPolitico = document.getElementById("grupoPolitico");
+        const grupoAmbiental = document.getElementById("grupoAmbiental");
+        const departamento = document.getElementById("departamento");
+        const provincia = document.getElementById("provincia");
+        const distrito = document.getElementById("distrito");
+        const capaAmbiental = document.getElementById("capaAmbiental");
+        const nombreArea = document.getElementById("nombreArea");
+        const satelite = document.getElementById("satelite");
+        const objetivo = document.getElementById("objetivo");
+        const indice = document.getElementById("indice");
+        const anioInicio = document.getElementById("anioInicio");
+        const anioFinal = document.getElementById("anioFinal");
+        const consultarBtn = document.getElementById("consultar");
 
-            if(idx === 'NDVI') {
-                f.innerText = "Fórmula: (NIR - RED) / (NIR + RED)";
-                fd.innerText = "Indica el vigor fotosintético de la superficie vegetal analizada.";
-                leg.innerHTML = `<div class="legend-row"><span class="color-dot" style="background:#15803d;"></span>Veg. Alta</div>
-                                 <div class="legend-row"><span class="color-dot" style="background:#ea580c;"></span>Suelo Desnudo</div>`;
-            } else if(idx === 'NDWI') {
-                f.innerText = "Fórmula: (GREEN - NIR) / (GREEN + NIR)";
-                fd.innerText = "Mide el contenido de agua en la vegetación y cuerpos hídricos superficiales.";
-                leg.innerHTML = `<div class="legend-row"><span class="color-dot" style="background:#2563eb;"></span>Agua / Humedad</div>
-                                 <div class="legend-row"><span class="color-dot" style="background:#cbd5e1;"></span>Suelo Seco</div>`;
-            } else {
-                f.innerText = "Fórmula: (NIR - SWIR) / (NIR + SWIR)";
-                fd.innerText = "Calcula la severidad de las quemas en áreas afectadas por incendios forestales.";
-                leg.innerHTML = `<div class="legend-row"><span class="color-dot" style="background:#b91c1c;"></span>Alta Severidad</div>
-                                 <div class="legend-row"><span class="color-dot" style="background:#16a34a;"></span>No Afectado</div>`;
-            }
-        });
+        let map, graphDonut, graphHist, graphBox, graphTrend;
 
-        document.getElementById('sensorSelect').addEventListener('change', function() {
-            document.getElementById('geeSens').innerText = this.value;
-        });
-        document.getElementById('yearSrc').addEventListener('change', function() {
-            document.getElementById('geeYear').innerText = this.value;
-        });
+        // Fórmulas y Metadatos de Índices para la sección científica
+        const metadatosIndices = {
+            "NDVI": { formula: "Formula: (NIR - RED) / (NIR + RED)", desc: "Indica el vigor fotosintético de la superficie vegetal analizada.", leg: `<div><span class="color-dot" style="background:#15803d;"></span>Veg. Alta</div><div><span class="color-dot" style="background:#ea580c;"></span>Suelo Desnudo</div>` },
+            "EVI": { formula: "Formula: 2.5 * ((NIR - RED) / (NIR + 6*RED - 7.5*BLUE + 1))", desc: "Índice de Vegetación Mejorado. Reduce la influencia atmosférica y del suelo.", leg: `<div><span class="color-dot" style="background:#166534;"></span>Alta Densidad</div>` },
+            "SAVI": { formula: "Formula: ((NIR - RED) / (NIR + RED + 0.5)) * 1.5", desc: "Índice de Vegetación Ajustado al Suelo para zonas con cobertura escasa.", leg: `<div><span class="color-dot" style="background:#854d0e;"></span>Suelo Ajustado</div>` },
+            "NDWI": { formula: "Formula: (GREEN - NIR) / (GREEN + NIR)", desc: "Mide el contenido de agua en cuerpos hídricos superficiales y vegetación.", leg: `<div><span class="color-dot" style="background:#2563eb;"></span>Cuerpos de Agua</div><div><span class="color-dot" style="background:#cbd5e1;"></span>Suelo Seco</div>` },
+            "MNDWI": { formula: "Formula: (GREEN - SWIR) / (GREEN + SWIR)", desc: "Índice Modificado de Agua. Resalta agua en entornos urbanos.", leg: `<div><span class="color-dot" style="background:#1d4ed8;"></span>Agua Pura</div>` },
+            "NDSI": { formula: "Formula: (GREEN - SWIR) / (GREEN + SWIR)", desc: "Índice de Nieve de Diferencia Normalizada. Mapea glaciares y nieve.", leg: `<div><span class="color-dot" style="background:#38bdf8;"></span>Nieve/Glacial</div>` },
+            "LST": { formula: "Algoritmo de Emisividad (TIR)", desc: "Temperatura Superficial del Terreno calculada vía bandas térmicas.", leg: `<div><span class="color-dot" style="background:#dc2626;"></span>Zonas Cálidas</div>` },
+            "BSI": { formula: "Formula: ((SWIR+RED)-(NIR+BLUE)) / ((SWIR+RED)+(NIR+BLUE))", desc: "Índice de Suelo Desnudo. Ideal para mapear erosión urbana o geomorfología.", leg: `<div><span class="color-dot" style="background:#78350f;"></span>Suelo Expuesto</div>` },
+            "NBR": { formula: "Formula: (NIR - SWIR) / (NIR + SWIR)", desc: "Relación de Calcinación Normalizada. Severidad de incendios forestales.", leg: `<div><span class="color-dot" style="background:#b91c1c;"></span>Alta Severidad</div><div><span class="color-dot" style="background:#16a34a;"></span>No Afectado</div>` }
+        };
 
-        // Configuración Base de Leaflet
-        const map = L.map('map').setView([-9.19, -75.01], 5);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
-        // MOTOR LÓGICO DE CONSULTA (Simulación Dinámica)
-        document.getElementById('runBtn').addEventListener('click', () => {
-            const mod = document.getElementById('modalidad').value;
-            const idx = document.getElementById('idxSelect').value;
-            const yStart = document.getElementById('yearSrc').value;
-            const sens = document.getElementById('sensorSelect').value;
-
-            let mainLabel = "", detailLabel = "";
-
-            if(mod === 'politico') {
-                mainLabel = document.getElementById('depSelect').value;
-                detailLabel = `${document.getElementById('provSelect').value} - ${document.getElementById('distSelect').value}`;
-                if(mainLabel === "Apurímac") map.setView([-13.63, -72.88], 9);
-                else if(mainLabel === "Cusco") map.setView([-13.52, -71.96], 9);
-                else map.setView([-12.04, -77.03], 9);
-            } else {
-                mainLabel = "Área Amb.";
-                detailLabel = document.getElementById('envAreaSelect').value;
-                if(detailLabel.includes("CAÑONCILLO")) map.setView([-7.44, -79.43], 12);
-                else map.setView([-5.25, -74.50], 8);
-            }
-
-            // Generación de Datos Dinámicos
-            const vProm = (Math.random() * (0.6 - 0.1) + 0.1).toFixed(3);
-            const vMax = (Math.random() * (0.9 - 0.6) + 0.6).toFixed(3);
-            const vMin = (Math.random() * (-0.01 - (-0.2)) + (-0.2)).toFixed(3);
-            const vArea = (Math.random() * (300 - 5) + 5).toFixed(2);
-            const vPix = Math.floor(Math.random() * 30000 + 4000).toLocaleString();
-            const vNubes = (Math.random() * 12 + 0.5).toFixed(1) + "%";
-
-            // Actualizar Tarjetas de Métricas en Pantalla
-            document.getElementById('mArea').innerText = `${vArea} km²`;
-            document.getElementById('mProm').innerText = vProm;
-            document.getElementById('mMax').innerText = vMax;
-            document.getElementById('mMin').innerText = vMin;
-            document.getElementById('mMed').innerText = (parseFloat(vProm) * 1.02).toFixed(3);
-            document.getElementById('mPix').innerText = vPix;
-            document.getElementById('lblNubes').innerText = vNubes;
-            document.getElementById('lblEscenas').innerText = Math.floor(Math.random() * 100 + 20);
-
-            // Sincronizar bloque descriptivo
-            document.getElementById('lblMedia').innerText = vProm;
-            document.getElementById('lblMediana').innerText = (parseFloat(vProm) * 1.02).toFixed(3);
-            document.getElementById('lblMin').innerText = vMin;
-            document.getElementById('lblMax').innerText = vMax;
-
-            // Refrescar Gráficos
-            actualizarGraficos(parseFloat(vProm), parseFloat(vMin), parseFloat(vMax));
-
-            // Inyectar fila en Historial de Consultas
-            const hTable = document.getElementById('historyRows');
-            hTable.insertAdjacentHTML('afterbegin', `<tr><td><b>${mainLabel}</b></td><td>${detailLabel.substring(0,18)}..</td><td style="color:var(--primary-blue); font-weight:700">${idx}</td><td>${yStart}</td></tr>`);
-
-            // Inyectar Escenas Utilizadas Dinámicas
-            document.getElementById('scenesRows').innerHTML = `
-                <tr><td>${sens.substring(0,4).toUpperCase()}_L1_PRC_${yStart}0615</td><td>${vNubes}</td></tr>
-                <tr><td>${sens.substring(0,4).toUpperCase()}_L1_PRC_${yStart}0920</td><td>1.8%</td></tr>
-            `;
-        });
-
-        document.getElementById('clearBtn').addEventListener('click', () => {
-            document.getElementById('mArea').innerText = "0 km²";
-            document.getElementById('mProm').innerText = "0.000";
-            document.getElementById('mMax').innerText = "0.000";
-            document.getElementById('mMin').innerText = "0.000";
-            map.setView([-9.19, -75.01], 5);
-            actualizarGraficos(0, 0, 0);
-        });
-
-        // GESTIÓN DE GRÁFICOS MEDIANTE CHART.JS
-        function instanciarGraficos(media, min, max) {
-            const chartOpts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
+        // Inicialización de Gráficos (Chart.js)
+        function inicializarGraficos() {
+            const opts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
 
             graphDonut = new Chart(document.getElementById('cDonut'), {
                 type: 'doughnut',
-                data: { labels: ['Alta', 'Baja'], datasets: [{ data: [70, 30], backgroundColor: ['#15803d', '#ea580c'] }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 6, font: { size: 8 } } } } }
+                data: { labels: ['Alta/Agua', 'Baja/Suelo'], datasets: [{ data: [65, 35], backgroundColor: ['#2563eb', '#ea580c'] }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
 
             graphHist = new Chart(document.getElementById('cHist'), {
                 type: 'bar',
-                data: { labels: [min.toFixed(1), '0.0', max.toFixed(1)], datasets: [{ data: [30, 140, 50], backgroundColor: '#1e293b' }] },
-                options: chartOpts
+                data: { labels: ['Mín', 'Med', 'Máx'], datasets: [{ data: [25, 120, 45], backgroundColor: '#1e293b' }] },
+                options: opts
             });
 
             graphBox = new Chart(document.getElementById('cBox'), {
                 type: 'bar',
-                data: { labels: ['Rango'], datasets: [{ data: [[min, max]], backgroundColor: '#94a3b8', barThickness: 10 }] },
-                options: chartOpts
+                data: { labels: ['Rango'], datasets: [{ data: [[-0.05, 0.89]], backgroundColor: '#94a3b8', barThickness: 12 }] },
+                options: opts
             });
 
             graphTrend = new Chart(document.getElementById('cTrend'), {
                 type: 'line',
-                data: { labels: ['2022', '2024', '2026'], datasets: [{ data: [0.22, 0.28, media], borderColor: '#2563eb', tension: 0.1, borderWidth: 1.5 }] },
-                options: chartOpts
+                data: { labels: ['2023', '2024', '2025', '2026'], datasets: [{ data: [0.58, 0.61, 0.64, 0.67], borderColor: '#3498db', tension: 0.2 }] },
+                options: opts
             });
         }
 
-        function actualizarGraficos(media, min, max) {
-            const pct = Math.abs(Math.floor(media * 100)) % 100;
-            graphDonut.data.datasets[0].data = [pct, 100 - pct];
+        // Carga de Capas Ambientales (ANPs)
+        async function actualizarAreasEspecificas() {
+            if (!capaAmbiental || !nombreArea) return;
+            const capa = capaAmbiental.value;
+            nombreArea.innerHTML = "";
+            
+            if (capa === "Seleccione...") {
+                nombreArea.disabled = true;
+                nombreArea.innerHTML = '<option value="Seleccione...">Seleccione una categoría primero...</option>';
+                return;
+            }
+            
+            nombreArea.disabled = true;
+            nombreArea.innerHTML = '<option value="Seleccione...">Procesando capas...</option>';
+            
+            let archivosAPescar = [];
+            if (capa === "acp") archivosAPescar = ["acp.geojson"];
+            else if (capa === "acr") archivosAPescar = ["acr.geojson"];
+            else if (capa === "zona_reservada") archivosAPescar = ["zona_reservada.geojson"];
+            else if (capa === "anpdefinitivas") archivosAPescar = ["anpdefinitivas.geojson"];
+            else if (capa === "zona_de_amortiguamiento") archivosAPescar = ["zona_de_amortiguamiento1.geojson", "zona_de_amortiguamiento2.geojson"];
+            
+            try {
+                let mapaItems = new Map();
+                // Simulación/Fetch Real de capas geográficas
+                for (const url of archivosAPescar) {
+                    const response = await fetch(url).catch(()=> null);
+                    if (!response || !response.ok) continue;
+                    
+                    const geojsonData = await response.json();
+                    geojsonData.features.forEach(f => {
+                        if (!f.properties) return;
+                        const props = f.properties;
+                        const llaves = Object.keys(props);
+                        let nombrePuro = "";
+                        
+                        const llaveNombre = llaves.find(k => ["anp_nomb", "za_nomb", "acr_nomb", "nombre", "name"].includes(k.toLowerCase()));
+                        if (llaveNombre && props[llaveNombre]) nombrePuro = props[llaveNombre].toString().trim();
+                        
+                        if (!nombrePuro) return;
+                        const categoria = props["c_nomb"] || props["anp_cate"] || "";
+                        let textoVisual = (categoria ? `[${categoria.toUpperCase()}] ` : `[ANP] `) + nombrePuro.toUpperCase();
+                        mapaItems.set(nombrePuro, { etiqueta: textoVisual, partes: 1 });
+                    });
+                }
+
+                // Fallback en caso no carguen archivos locales para pruebas visuales robustas
+                if (mapaItems.size === 0) {
+                    const fallbacks = ["ANCÓN", "BOSQUE DE ZÁRATE", "CHANCAYBAÑOS", "CORDILLERA HUAYHUASH", "RESERVA PAISAJÍSTICA CERRO KHAPIA", "RÍO NIEVA", "SANTIAGO COMAINA", "SIERRA DEL DIVISOR"];
+                    fallbacks.forEach(f => mapaItems.set(f, { etiqueta: `[ANP] ${f}`, partes: 1 }));
+                }
+
+                const itemsOrdenados = Array.from(mapaItems.entries()).sort((a, b) => a[1].etiqueta.localeCompare(b[1].etiqueta));
+                nombreArea.innerHTML = '<option value="Seleccione...">Seleccione un área...</option>';
+                itemsOrdenados.forEach(([nombreReal, info]) => {
+                    let opt = document.createElement("option");
+                    opt.value = nombreReal;
+                    opt.textContent = info.etiqueta;
+                    nombreArea.appendChild(opt);
+                });
+                nombreArea.disabled = false;
+            } catch (error) {
+                console.error("Error cargando ANPs:", error);
+                nombreArea.innerHTML = '<option value="Seleccione...">Error al mapear capas</option>';
+            }
+        }
+
+        // Gestión de Índices Dinámicos por Objetivo
+        function actualizarIndicesPorObjetivo() {
+            if (!objetivo || !indice) return;
+            indice.innerHTML = "";
+            const lista = indicesPorObjetivo[objetivo.value] || ["NDVI"];
+            lista.forEach(ind => {
+                let opt = document.createElement("option");
+                opt.value = ind;
+                opt.textContent = `${ind} (${objetivo.value})`;
+                indice.appendChild(opt);
+            });
+            actualizarMetadatosCientificos();
+        }
+
+        function actualizarMetadatosCientificos() {
+            const idxActual = indice.value.split(" ")[0]; // Limpiar sufijo
+            const meta = metadatosIndices[idxActual] || { formula: "Fórmula personalizada GEE", desc: "Cálculo espectral multi-banda.", leg: "<div>Variación de índice.</div>" };
+            
+            document.getElementById('lblFormula').innerText = meta.formula;
+            document.getElementById('lblFormulaDesc').innerText = meta.desc;
+            document.getElementById('legTitle').innerText = `LEYENDA ${idxActual}`;
+            document.getElementById('legItems').innerHTML = meta.leg;
+            
+            // Sincronizar overlay del mapa
+            document.getElementById('geeIdx').innerText = idxActual;
+        }
+
+        // Control de Años por Misión Satelital
+        function validarYFiltrarAniosPorSatelite() {
+            if (!satelite || !anioInicio || !anioFinal) return;
+            const rango = limitesSatelites[satelite.value] || { min: 1985, max: 2026, def: 2020 };
+            const vIni = parseInt(anioInicio.value) || rango.def;
+            const vFin = parseInt(anioFinal.value) || rango.def;
+
+            anioInicio.innerHTML = "";
+            anioFinal.innerHTML = "";
+
+            for (let i = rango.min; i <= rango.max; i++) {
+                let opt1 = document.createElement("option");
+                opt1.value = i; opt1.textContent = i;
+                anioInicio.appendChild(opt1);
+                anioFinal.appendChild(opt1.cloneNode(true));
+            }
+
+            anioInicio.value = (vIni >= rango.min && vIni <= rango.max) ? vIni : rango.def;
+            anioFinal.value = (vFin >= rango.min && vFin <= rango.max) ? vFin : rango.def;
+            
+            document.getElementById('sensor').innerText = satelite.value;
+            document.getElementById('anio').innerText = `${anioInicio.value} - ${anioFinal.value}`;
+        }
+
+        // Carga de Divisiones Políticas (Ubigeo)
+        function cargarDepartamentosReal() {
+            if (!departamento) return;
+            departamento.innerHTML = '<option value="Seleccione...">Seleccione...</option>';
+            Object.keys(dataUbigeo).forEach(dep => {
+                let opt = document.createElement("option");
+                opt.value = dep; opt.textContent = dep;
+                departamento.appendChild(opt);
+            });
+        }
+
+        // Eventos Ubigeo
+        departamento.addEventListener('change', () => {
+            provincia.innerHTML = '<option value="Seleccione...">Seleccione...</option>';
+            distrito.innerHTML = '<option value="Seleccione...">Seleccione...</option>';
+            if (departamento.value !== "Seleccione...") {
+                Object.keys(dataUbigeo[departamento.value] || {}).forEach(prov => {
+                    let opt = document.createElement("option");
+                    opt.value = prov; opt.textContent = prov;
+                    provincia.appendChild(opt);
+                });
+            }
+        });
+
+        provincia.addEventListener('change', () => {
+            distrito.innerHTML = '<option value="Seleccione...">Seleccione...</option>';
+            if (provincia.value !== "Seleccione...") {
+                (dataUbigeo[departamento.value]?.[provincia.value] || []).forEach(dist => {
+                    let opt = document.createElement("option");
+                    opt.value = dist; opt.textContent = dist;
+                    distrito.appendChild(opt);
+                });
+            }
+        });
+
+        function escucharCambiosTipoConsulta() {
+            tipoConsulta.addEventListener("change", () => {
+                if (tipoConsulta.value === "conservacion") {
+                    grupoAmbiental.style.display = "block";
+                    grupoPolitico.style.display = "none";
+                } else {
+                    grupoAmbiental.style.display = "none";
+                    grupoPolitico.style.display = "block";
+                }
+            });
+            capaAmbiental.addEventListener("change", actualizarAreasEspecificas);
+            objetivo.addEventListener("change", actualizarIndicesPorObjetivo);
+            indice.addEventListener("change", actualizarMetadatosCientificos);
+            satelite.addEventListener("change", validarYFiltrarAniosPorSatelite);
+            anioInicio.addEventListener("change", () => document.getElementById('anio').innerText = `${anioInicio.value} - ${anioFinal.value}`);
+            anioFinal.addEventListener("change", () => document.getElementById('anio').innerText = `${anioInicio.value} - ${anioFinal.value}`);
+        }
+
+        // Acción del Botón Consultar (Genera simulación de análisis de datos)
+        consultarBtn.addEventListener('click', () => {
+            // Generar analíticas dinámicas aleatorias basadas en el índice
+            const p = (Math.random() * (0.75 - 0.1) + 0.1).toFixed(3);
+            const max = (Math.random() * (0.98 - 0.7) + 0.7).toFixed(3);
+            const min = (Math.random() * (-0.02 - (-0.3)) + (-0.3)).toFixed(3);
+            const dev = (Math.random() * 0.08 + 0.01).toFixed(3);
+            const nubes = (Math.random() * 15 + 0.5).toFixed(1) + "%";
+
+            // Modificar Dashboard
+            document.getElementById("resArea").innerText = (Math.random() * 300 + 10).toFixed(1) + " km²";
+            document.getElementById("resProm").innerText = p;
+            document.getElementById("resMax").innerText = max;
+            document.getElementById("resMin").innerText = min;
+            document.getElementById("mDev").innerText = dev;
+
+            document.getElementById("lblNubes").innerText = nubes;
+            document.getElementById("lblEscenas").innerText = Math.floor(Math.random() * 80 + 40);
+
+            // Mutar Gráficos Chart.js
+            const share = Math.floor(parseFloat(p) * 100) || 50;
+            graphDonut.data.datasets[0].data = [Math.abs(share), 100 - Math.abs(share)];
             graphDonut.update();
 
-            graphHist.data.labels = [min.toFixed(1), '0.0', max.toFixed(1)];
-            graphHist.data.datasets[0].data = [Math.floor(Math.random()*40), Math.floor(Math.random()*150), Math.floor(Math.random()*60)];
+            graphHist.data.datasets[0].data = [Math.floor(Math.random()*40), Math.floor(Math.random()*160), Math.floor(Math.random()*50)];
             graphHist.update();
 
-            graphBox.data.datasets[0].data = [[min, max]];
+            graphBox.data.datasets[0].data = [[parseFloat(min), parseFloat(max)]];
             graphBox.update();
 
-            graphTrend.data.datasets[0].data = [(Math.random()*0.4).toFixed(2), (Math.random()*0.4).toFixed(2), media];
+            graphTrend.data.datasets[0].data = [(Math.random()*0.5).toFixed(2), (Math.random()*0.5).toFixed(2), (Math.random()*0.6).toFixed(2), p];
             graphTrend.update();
-        }
+        });
+
+        // Inicialización General
+        window.onload = () => {
+            // Inicializar Mapa Leaflet
+            map = L.map('map').setView([-9.19, -75.015], 5);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 18,
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            inicializarGraficos();
+            cargarDepartamentosReal();
+            actualizarIndicesPorObjetivo();
+            validarYFiltrarAniosPorSatelite();
+            escucharCambiosTipoConsulta();
+
+            // Apagar Loader de Entrada
+            const loader = document.getElementById("loader");
+            loader.style.opacity = '0';
+            setTimeout(() => { loader.style.display = "none"; }, 500);
+            
+            // Despertar backend Render en segundo plano
+            fetch(`${BASE_URL_API_REAL}/`).catch(() => console.log("Despertando servidor Render..."));
+        };
     </script>
 </body>
 </html>
