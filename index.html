@@ -3,228 +3,560 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GEOVISOR PERÚ v3.0 - Plataforma de Análisis Geospatial</title>
+    <title>GeoSpatial Perú - Plataforma de Análisis Satelital</title>
     
-    <!-- Leaflet y Chart.js -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <!-- Enlace a tu CSS externo (Source 3) -->
-    <link rel="stylesheet" href="style.css" />
-
-    <!-- Estilos internos del nuevo diseño (Source 5) -->
     <style>
-        :root {
-            --bg-main: #f1f5f9;
-            --bg-card: #ffffff;
-            --border-color: #cbd5e1;
-            --text-dark: #1e293b;
-            --text-muted: #64748b;
-            --primary-blue: #0284c7;
-            --accent-green: #16a34a;
-            --dark-blue: #1e3a8a;
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
         }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
-        body { background-color: #f3f4f6; color: var(--text-dark); font-size: 10px; width: 100vw; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
         
-        /* --- TOP HEADER --- */
-        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); height: 48px; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
-        .brand-area { display: flex; align-items: center; gap: 10px; }
-        .brand-logo { width: 28px; height: 28px; background: linear-gradient(135deg, #1d4ed8, #3b82f6); transform: rotate(45deg); display: flex; align-items: center; justify-content: center; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .brand-logo::after { content: ''; width: 12px; height: 12px; background: white; border-radius: 2px; }
-        .brand-title h1 { font-size: 15px; font-weight: 900; color: #0f172a; letter-spacing: -0.5px; line-height: 1.1; }
-        .brand-title p { font-size: 9px; color: var(--text-muted); font-weight: 600; }
-        .nav-links { display: flex; list-style: none; gap: 18px; height: 100%; align-items: center; }
-        .nav-links a { text-decoration: none; color: #475569; font-weight: bold; font-size: 11px; display: flex; align-items: center; gap: 4px; height: 48px; border-bottom: 2px solid transparent; }
-        .nav-links a.active { color: #2563eb; border-bottom: 2px solid #2563eb; }
-        .user-panel { display: flex; align-items: center; gap: 10px; }
-        .user-text { text-align: right; line-height: 1.2; }
-        .user-avatar { width: 32px; height: 32px; background: #e2e8f0; border-radius: 50%; border: 1px solid var(--border-color); background-image: radial-gradient(circle, #94a3b8 40%, #cbd5e1 41%); }
-
-        /* --- MAIN GRID LAYOUT --- */
-        .main-container { display: grid; grid-template-columns: 250px 1fr 250px; gap: 6px; padding: 6px; flex: 1; overflow: hidden; }
-        .column { display: flex; flex-direction: column; gap: 6px; height: 100%; overflow-y: auto; }
-        .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 4px; padding: 8px; display: flex; flex-direction: column; gap: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
-        .card-header-title { font-size: 10px; font-weight: 800; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; padding-bottom: 3px; color: #0f172a; display: flex; align-items: center; gap: 4px; }
-        .item-label { font-weight: bold; font-size: 9.5px; color: #1e293b; margin-top: 3px; }
-        .sub-label { font-size: 8.5px; color: var(--text-muted); margin-bottom: 1px; }
-        .select-box { width: 100%; padding: 4px; border: 1px solid var(--border-color); border-radius: 3px; font-size: 10px; background: #ffffff; color: #334155; outline: none; }
+        body { 
+            display: flex; 
+            width: 100vw;
+            height: 100vh; 
+            overflow: hidden;
+            background-color: #f4f6f9; 
+            color: #333; 
+        }
         
-        .info-green-box { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 4px; padding: 6px; margin-top: 2px; }
-        .info-green-box h5 { color: #15803d; font-size: 9px; font-weight: 800; margin-bottom: 4px; border-bottom: 1px solid #dcfce7; padding-bottom: 2px; }
-        .info-green-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; font-size: 8px; line-height: 1.2; }
-        .info-green-grid div { color: var(--text-muted); }
-        .info-green-grid span { font-weight: bold; color: #166534; }
+        /* Sidebar (Panel de Control Izquierdo) */
+        #sidebar { 
+            width: 380px; 
+            min-width: 380px;
+            height: 100vh;
+            background: #ffffff; 
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1); 
+            display: flex; 
+            flex-direction: column; 
+            z-index: 1000; 
+            overflow-y: auto; 
+        }
         
-        .export-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 2px; }
-        .btn-export { background: #fff; border: 1px solid var(--border-color); padding: 5px 2px; border-radius: 3px; font-size: 8px; text-align: center; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; }
-        .main-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 4px; }
-        .btn-action { padding: 6px; border: none; border-radius: 3px; font-weight: bold; font-size: 10px; cursor: pointer; text-align: center; color: white; }
-        .btn-consultar { background: #0284c7; }
-        .btn-limpiar { background: var(--accent-green); }
-
-        /* --- MAP & METRICS --- */
-        .map-wrapper { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 4px; display: flex; flex-direction: column; height: 360px; position: relative; }
-        #map { flex: 1; width: 100%; z-index: 1; }
-        .metrics-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-        .metric-card { background: white; border: 1px solid var(--border-color); border-radius: 3px; padding: 4px; text-align: center; line-height: 1.1; }
-        .metric-card p { font-size: 7.5px; font-weight: bold; color: var(--text-muted); text-transform: uppercase; white-space: nowrap; }
-        .metric-card h3 { font-size: 11px; font-weight: 900; color: #0f172a; margin-top: 1px; }
-        .metric-card span { font-size: 7px; color: var(--text-muted); display: block; }
-
-        /* --- LOADER --- */
-        #loader { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(44, 62, 80, 0.9); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; font-size: 1.5rem; }
-        .spinner { width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .brand-header { 
+            padding: 20px; 
+            background: #2c3e50; 
+            color: #fff; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
+        
+        .brand-header h2 { 
+            font-size: 1.2rem; 
+            font-weight: 600; 
+            letter-spacing: 0.5px; 
+        }
+        
+        .section-panel { 
+            padding: 20px; 
+            border-bottom: 1px solid #eef2f5; 
+        }
+        
+        .section-title { 
+            font-size: 0.85rem; 
+            font-weight: 700; 
+            color: #7f8c8d; 
+            text-transform: uppercase; 
+            margin-bottom: 15px; 
+            letter-spacing: 0.5px; 
+        }
+        
+        .form-group { 
+            margin-bottom: 15px; 
+        }
+        
+        .form-group label { 
+            display: block; 
+            font-size: 0.85rem; 
+            font-weight: 600; 
+            color: #34495e; 
+            margin-bottom: 6px; 
+        }
+        
+        .form-control { 
+            width: 100%; 
+            padding: 10px 12px; 
+            border: 1px solid #dcdde1; 
+            border-radius: 6px; 
+            font-size: 0.9rem; 
+            color: #2c3e50; 
+            background-color: #fcfcfc; 
+            transition: all 0.3s ease; 
+        }
+        
+        .form-control:focus { 
+            border-color: #3498db; 
+            outline: none; 
+            background-color: #fff; 
+            box-shadow: 0 0 0 3px rgba(52,152,219,0.15); 
+        }
+        
+        .form-control:disabled { 
+            background-color: #f1f2f6; 
+            color: #7f8c8d; 
+            cursor: not-allowed; 
+        }
+        
+        .row-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 12px; 
+        }
+        
+        .btn-container { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 12px; 
+            padding: 20px; 
+            background: #f8f9fa; 
+        }
+        
+        .btn { 
+            padding: 12px; 
+            border: none; 
+            border-radius: 6px; 
+            font-size: 0.9rem; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.2s ease; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 8px; 
+        }
+        
+        .btn-primary { background: #3498db; color: #fff; }
+        .btn-primary:hover { background: #2980b9; }
+        
+        .btn-secondary { background: #e74c3c; color: #fff; }
+        .btn-secondary:hover { background: #c0392b; }
+        
+        /* Contenedor del Mapa y Capas del Lado Derecho */
+        #map-container { 
+            flex: 1; 
+            height: 100vh;
+            position: relative; 
+            display: flex; 
+            flex-direction: column; 
+        }
+        
+        #map { 
+            flex: 1; 
+            width: 100%; 
+            height: 100%; 
+        }
+        
+        /* Overlays flotantes del mapa */
+        .info-overlay { 
+            position: absolute; 
+            top: 20px; 
+            left: 20px; 
+            background: rgba(255,255,255,0.95); 
+            padding: 15px 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15); 
+            z-index: 1000; 
+            border-left: 4px solid #2ecc71; 
+            min-width: 220px; 
+            pointer-events: auto; 
+        }
+        
+        .info-overlay h4 { 
+            font-size: 0.95rem; 
+            margin-bottom: 8px; 
+            color: #2c3e50; 
+            font-weight: 700; 
+        }
+        
+        .info-overlay p { 
+            font-size: 0.85rem; 
+            color: #555; 
+            margin-bottom: 4px; 
+            display: flex; 
+            justify-content: space-between; 
+        }
+        
+        .info-overlay span { 
+            font-weight: 600; 
+            color: #2c3e50; 
+        }
+        
+        .toolbar-right { 
+            position: absolute; 
+            top: 20px; 
+            right: 20px; 
+            z-index: 1000; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+        }
+        
+        .toolbar-btn { 
+            width: 40px; 
+            height: 40px; 
+            background: #fff; 
+            border: none; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 1.2rem; 
+            color: #2c3e50; 
+            transition: all 0.2s; 
+        }
+        
+        .toolbar-btn:hover { 
+            background: #f8f9fa; 
+            color: #3498db; 
+            transform: translateY(-2px); 
+        }
+        
+        /* Dashboard de Resultados Inferior */
+        .dashboard-results { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 15px; 
+            padding: 15px 20px; 
+            background: #fff; 
+            border-top: 1px solid #eef2f5; 
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.02); 
+            z-index: 999; 
+        }
+        
+        .result-card { 
+            background: #f8f9fa; 
+            padding: 15px; 
+            border-radius: 8px; 
+            border: 1px solid #eef2f5; 
+            transition: all 0.3s; 
+        }
+        
+        .result-card:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+        }
+        
+        .result-card p { 
+            font-size: 0.75rem; 
+            font-weight: 700; 
+            color: #7f8c8d; 
+            text-transform: uppercase; 
+            margin-bottom: 5px; 
+            letter-spacing: 0.5px; 
+        }
+        
+        .result-card h1 { 
+            font-size: 1.4rem; 
+            color: #2c3e50; 
+            font-weight: 600; 
+        }
+        
+        /* Historial de Consultas (Tablas) */
+        .table-container { 
+            padding: 0 20px 20px 20px; 
+            max-height: 200px; 
+            overflow-y: auto; 
+        }
+        
+        .data-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            font-size: 0.8rem; 
+            text-align: left; 
+        }
+        
+        .data-table th { 
+            position: sticky; 
+            top: 0; 
+            background: #f4f6f9; 
+            padding: 10px; 
+            font-weight: 700; 
+            color: #7f8c8d; 
+            border-bottom: 2px solid #eef2f5; 
+        }
+        
+        .data-table td { 
+            padding: 10px; 
+            border-bottom: 1px solid #eef2f5; 
+            color: #34495e; 
+        }
+        
+        .data-table tbody tr:hover { background: #fcfcfc; }
+        
+        /* Descargas */
+        .container-descargas { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 10px; 
+        }
+        
+        .btn-download { 
+            padding: 8px; 
+            font-size: 0.8rem; 
+            border: 1px solid #dcdde1; 
+            background: #fff; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            color: #555; 
+            transition: all 0.2s; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 6px; 
+        }
+        
+        .btn-download:hover { 
+            background: #f1f2f6; 
+            border-color: #b2bec3; 
+            color: #2c3e50; 
+        }
+        
+        /* Loader de Entrada */
+        #loader { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh; 
+            background: rgba(44, 62, 80, 0.9); 
+            z-index: 9999; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            color: white; 
+            font-size: 1.5rem; 
+            display: none; /* Oculto por defecto para que no estorbe si app.js demora */
+        }
+        
+        .spinner { 
+            width: 50px; 
+            height: 50px; 
+            border: 5px solid #f3f3f3; 
+            border-top: 5px solid #3498db; 
+            border-radius: 50%; 
+            animation: spin 1s linear infinite; 
+            margin-bottom: 15px; 
+        }
+        
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
     </style>
 </head>
 <body>
 
-    <!-- Loader de Entrada (Requerido por app.js) -->
     <div id="loader">
         <div class="spinner"></div>
         <p>Inicializando recursos GIS...</p>
     </div>
 
-    <!-- HEADER -->
-    <header>
-        <div class="brand-area">
-            <div class="brand-logo"></div>
-            <div class="brand-title">
-                <h1>GEOVISOR PERÚ</h1>
-                <p>Plataforma de Análisis Geospatial</p>
-            </div>
+    <!-- PANEL LATERAL IZQUIERDO -->
+    <div id="sidebar">
+        <div class="brand-header">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            <h2>GEOSPATIAL PERÚ</h2>
         </div>
-        <div class="user-panel">
-            <div class="user-text">
-                <strong style="font-size: 10px; color:#0f172a;">Administrador</strong><br>
-                <span style="color: var(--text-muted); font-size: 8.5px; font-weight: 500;">Investigador</span>
-            </div>
-            <div class="user-avatar"></div>
-            <span style="font-size:8px; color:var(--text-muted); margin-left:-4px;">v3.0</span>
-        </div>
-    </header>
 
-    <div class="main-container">
-
-        <!-- COLUMNA IZQUIERDA -->
-        <div class="column">
-            <div class="card">
-                <div class="card-header-title">📁 CONFIGURACIÓN DE ANÁLISIS</div>
-                
-                <div class="item-label">1. ENFOQUE DE CONSULTA</div>
-                <select id="tipoConsulta" class="select-box">
-                    <option value="conservacion">Áreas Naturales y Conservación (ANPs)</option>
+        <div class="section-panel">
+            <div class="section-title">1. Enfoque Espacial de Consulta</div>
+            <div class="form-group">
+                <label for="tipoConsulta">Modalidad de Análisis</label>
+                <!-- ID clave: tipoConsulta -->
+                <select id="tipoConsulta" class="form-control">
                     <option value="politico">División Político-Administrativa</option>
+                    <option value="conservacion">Áreas Naturales y Conservación (ANPs)</option>
                 </select>
+            </div>
+        </div>
 
-                <!-- Grupo Político Oculto por defecto, requerido por app.js -->
-                <div id="grupoPolitico" style="display: none; margin-top: 5px;">
-                    <select id="departamento" class="select-box"><option value="Seleccione...">Departamento...</option></select>
-                    <select id="provincia" class="select-box" style="margin-top: 2px;"><option value="Seleccione...">Provincia...</option></select>
-                    <select id="distrito" class="select-box" style="margin-top: 2px;"><option value="Seleccione...">Distrito...</option></select>
+        <div class="section-panel">
+            <div class="section-title">2. Límites Cartográficos</div>
+            
+            <!-- Grupo de División Política -->
+            <div id="grupoPolitico">
+                <div class="form-group">
+                    <label for="departamento">Departamento</label>
+                    <select id="departamento" class="form-control">
+                        <option value="Seleccione...">Cargando...</option>
+                    </select>
                 </div>
+                <div class="row-grid">
+                    <div class="form-group">
+                        <label for="provincia">Provincia</label>
+                        <select id="provincia" class="form-control">
+                            <option value="Seleccione...">Seleccione...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="distrito">Distrito</label>
+                        <select id="distrito" class="form-control">
+                            <option value="Seleccione...">Seleccione...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
 
-                <div id="grupoAmbiental">
-                    <div class="item-label">2. LÍMITES CARTOGRÁFICOS</div>
-                    <select id="capaAmbiental" class="select-box" style="margin-bottom: 3px;">
-                        <option value="Seleccione...">Categoría de Conservación...</option>
+            <!-- Grupo de Áreas Ambientales (Oculto por defecto, app.js lo muestra al cambiar el enfoque) -->
+            <div id="grupoAmbiental" style="display: none;">
+                <div class="form-group">
+                    <label for="capaAmbiental">Categoría de Conservación</label>
+                    <select id="capaAmbiental" class="form-control">
+                        <option value="Seleccione...">Seleccione...</option>
                         <option value="anpdefinitivas">ANP Administración Nacional</option>
                         <option value="acr">Áreas de Conservación Regional (ACR)</option>
                         <option value="acp">Áreas de Conservación Privada (ACP)</option>
                         <option value="zona_reservada">Zonas Reservadas</option>
                         <option value="zona_de_amortiguamiento">Zonas de Amortiguamiento</option>
                     </select>
-                    <select id="nombreArea" class="select-box">
-                        <option value="Seleccione...">Área de Estudio Específica...</option>
+                </div>
+                <div class="form-group">
+                    <label for="nombreArea">Área de Estudio Específica</label>
+                    <select id="nombreArea" class="form-control" disabled>
+                        <option value="Seleccione...">Seleccione una categoría primero...</option>
                     </select>
                 </div>
+            </div>
+        </div>
 
-                <div class="item-label">3. PARÁMETROS DE MISIÓN</div>
-                <select id="satelite" class="select-box" style="margin-bottom: 3px;">
+        <div class="section-panel">
+            <div class="section-title">3. Parámetros de Misión</div>
+            <div class="form-group">
+                <label for="satelite">Sensor Satelital</label>
+                <!-- Todos los satélites agregados aquí -->
+                <select id="satelite" class="form-control">
                     <option value="Landsat 5">Landsat 5 (TM) [1984 - 2011]</option>
+                    <option value="Landsat 7">Landsat 7 (ETM+) [1999 - Act]</option>
                     <option value="Landsat 8">Landsat 8 (OLI) [2013 - Act]</option>
+                    <option value="Landsat 9">Landsat 9 (OLI-2) [2021 - Act]</option>
+                    <option value="Sentinel 1">Sentinel 1 (SAR) [2014 - Act]</option>
                     <option value="Sentinel 2">Sentinel 2 (MSI) [2015 - Act]</option>
+                    <option value="Sentinel 3">Sentinel 3 (OLCI) [2016 - Act]</option>
                 </select>
-                <select id="objetivo" class="select-box" style="margin-bottom: 3px;">
+            </div>
+            <div class="form-group">
+                <label for="objetivo">Objetivo del Estudio</label>
+                <select id="objetivo" class="form-control">
                     <option value="Vegetación">Análisis de Vegetación</option>
                     <option value="Agua">Recursos Hídricos y Humedad</option>
+                    <option value="Área Glacial">Zonas Criogénicas y Glaciares</option>
+                    <option value="Temperatura">Temperatura Superficial (LST)</option>
+                    <option value="Suelo">Geomorfología y Suelo Expuesto</option>
+                    <option value="Área Urbana">Expansión Urbana e Infraestructura</option>
+                    <option value="Incendios y Antropización">Incendios y Antropización</option>
                 </select>
-                <select id="indice" class="select-box">
-                    <option value="NDVI">NDVI</option>
+            </div>
+            <div class="form-group">
+                <label for="indice">Índice Espectral</label>
+                <select id="indice" class="form-control">
+                    <option value="NDVI">NDVI (Vegetación)</option>
                 </select>
-
-                <div class="item-label">4. TEMPORALIDAD DE ANÁLISIS</div>
-                <div style="display: flex; gap: 5px;">
-                    <select id="anioInicio" class="select-box"></select>
-                    <select id="anioFinal" class="select-box"></select>
-                </div>
-
-                <div class="item-label">5. EXPORTACIÓN CIENTÍFICA</div>
-                <div class="export-grid">
-                    <div class="btn-export" id="btnTiff">💾<br>GeoTIFF</div>
-                    <div class="btn-export" id="btnShp">📦<br>SHP</div>
-                    <div class="btn-export" id="btnPng">📊<br>PNG</div>
-                    <div class="btn-export" id="btnPdf">📄<br>PDF</div>
-                </div>
-
-                <div class="main-actions">
-                    <button id="consultar" class="btn-action btn-consultar">Consultar</button>
-                    <button id="limpiar" class="btn-action btn-limpiar">Limpiar</button>
-                </div>
             </div>
+        </div>
 
-            <!-- Historial -->
-            <div class="card" style="flex: 1; min-height: 110px;">
-                <div class="card-header-title">6. HISTORIAL DE CONSULTAS</div>
-                <div class="table-container" style="max-height: 150px; overflow-y: auto;">
-                    <table class="main-data-table">
-                        <thead>
-                            <tr><th>Dep.</th><th>Prov.</th><th>Dist.</th><th>Ind.</th><th>Año</th><th>Sat.</th></tr>
-                        </thead>
-                        <tbody id="tablaResultados"></tbody>
-                    </table>
+        <div class="section-panel">
+            <div class="section-title">4. Temporalidad Análisis</div>
+            <div class="row-grid">
+                <div class="form-group">
+                    <label for="anioInicio">Año Inicial</label>
+                    <select id="anioInicio" class="form-control"></select>
+                </div>
+                <div class="form-group">
+                    <label for="anioFinal">Año Final</label>
+                    <select id="anioFinal" class="form-control"></select>
                 </div>
             </div>
         </div>
 
-        <!-- COLUMNA CENTRAL MAPA -->
-        <div class="column">
-            <div class="map-wrapper">
-                <div id="map"></div>
-                <!-- Información flotante (Requerido por app.js) -->
-                <div style="position: absolute; top: 10px; left: 10px; z-index: 1000; background: rgba(255,255,255,0.9); padding: 5px; border-radius: 4px; border: 1px solid #ccc; font-size: 10px;">
-                    <b>Índice:</b> <span id="indiceNombre">NDVI</span> | 
-                    <b>Sensor:</b> <span id="sensor">Landsat 5</span> | 
-                    <b>Año:</b> <span id="anio">2010</span>
-                </div>
-            </div>
-
-            <!-- MÉTRICAS (Con los ID en los h3 para app.js) -->
-            <div class="metrics-row">
-                <div class="metric-card"><p>Área de Estudio</p><h3 id="resArea">0 km²</h3><span>Superficie Total</span></div>
-                <div class="metric-card"><p>Valor Promedio</p><h3 id="resProm">0.00</h3><span>Índice Promedio</span></div>
-                <div class="metric-card"><p>Valor Máximo</p><h3 id="resMax">0.00</h3><span>Valor Más Alto</span></div>
-                <div class="metric-card"><p>Valor Mínimo</p><h3 id="resMin">0.00</h3><span>Valor Más Bajo</span></div>
-            </div>
-        </div>
-        
-        <!-- COLUMNA DERECHA (Opcional, lista para ser llenada) -->
-        <div class="column">
-            <div class="card">
-                <div class="card-header-title">PANEL ADICIONAL</div>
-                <p style="font-size: 9px; color: var(--text-muted);">Espacio reservado para herramientas futuras o calidad de datos.</p>
+        <div class="section-panel">
+            <div class="section-title">5. Exportación Científica</div>
+            <div class="container-descargas">
+                <!-- Botones de descarga vinculados a app.js -->
+                <button id="btnTiff" class="btn-download">💾 GeoTIFF</button>
+                <button id="btnShp" class="btn-download">📦 SHP</button>
+                <button id="btnPng" class="btn-download">📸 PNG</button>
+                <button id="btnPdf" class="btn-download">📄 PDF</button>
             </div>
         </div>
 
+        <div class="btn-container">
+            <button id="limpiar" class="btn btn-secondary">Limpiar</button>
+            <button id="consultar" class="btn btn-primary">Consultar</button>
+        </div>
+
+        <div class="section-title" style="padding: 20px 20px 5px 20px;">6. Historial de Consultas</div>
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Dep.</th>
+                        <th>Prov.</th>
+                        <th>Dist.</th>
+                        <th>Ind.</th>
+                        <th>Año</th>
+                        <th>Sat.</th>
+                        <th>Área</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaResultados"></tbody>
+            </table>
+        </div>
     </div>
 
-    <!-- LIBRERÍAS Y TUS SCRIPTS ORIGINALES -->
+    <!-- PANEL DEL MAPA Y RESULTADOS (DERECHA) -->
+    <div id="map-container">
+        <div id="map"></div>
+        
+        <div class="info-overlay">
+            <h4>Capa Activa GEE</h4>
+            <p>Índice Espectral: <span id="indiceNombre">NDVI</span></p>
+            <p>Plataforma Sensor: <span id="sensor">Landsat 5</span></p>
+            <p>Ventana Temporal: <span id="anio">2010</span></p>
+        </div>
+
+        <div class="toolbar-right">
+            <button class="toolbar-btn" title="Mapa Base OSM">🗺</button>
+            <button class="toolbar-btn" title="Geolocalización GPS">📍</button>
+            <button class="toolbar-btn" title="Pantalla Completa">📺</button>
+        </div>
+
+        <!-- Dashboard Inferior con los IDs conectados a app.js -->
+        <div class="dashboard-results">
+            <div class="result-card">
+                <p>Área de Estudio</p>
+                <h1 id="resArea">0 km²</h1>
+            </div>
+            <div class="result-card">
+                <p>Valor Promedio</p>
+                <h1 id="resProm">0.00</h1>
+            </div>
+            <div class="result-card">
+                <p>Valor Máximo</p>
+                <h1 id="resMax">0.00</h1>
+            </div>
+            <div class="result-card">
+                <p>Valor Mínimo</p>
+                <h1 id="resMin">0.00</h1>
+            </div>
+        </div>
+    </div>
+
+    <!-- TUS SCRIPTS (No modificar el orden) -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
     <script src="js/ubigeo.js"></script>
     <script src="js/app.js"></script>
-
 </body>
 </html>
