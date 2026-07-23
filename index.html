@@ -432,19 +432,101 @@
             </div>
 
             <div class="card">
-                <div class="card-header">📉 ÍNDICES UTILIZADOS</div>
-                <div class="card-body" style="gap:8px;">
-                    <div class="progress-row"><div class="prog-label">NDVI</div><div class="prog-val">0.67</div><div class="prog-bar-bg"><div class="prog-bar-fill" style="width:100%"></div></div><div class="prog-val">100%</div></div>
-                    <div class="progress-row"><div class="prog-label">EVI</div><div class="prog-val">0.51</div><div class="prog-bar-bg"><div class="prog-bar-fill" style="width:85%"></div></div><div class="prog-val">100%</div></div>
-                    <div class="progress-row"><div class="prog-label">NDWI</div><div class="prog-val">0.23</div><div class="prog-bar-bg"><div class="prog-bar-fill" style="width:40%; background: #3b82f6;"></div></div><div class="prog-val">100%</div></div>
-                    <div class="progress-row"><div class="prog-label">NDBI</div><div class="prog-val">-0.12</div><div class="prog-bar-bg"><div class="prog-bar-fill" style="width:20%; background: #ef4444;"></div></div><div class="prog-val">100%</div></div>
-                    <div class="progress-row"><div class="prog-label">SAVI</div><div class="prog-val">0.48</div><div class="prog-bar-bg"><div class="prog-bar-fill" style="width:75%"></div></div><div class="prog-val">100%</div></div>
-                    <div class="progress-row"><div class="prog-label">MSAVI2</div><div class="prog-val">0.46</div><div class="prog-bar-bg"><div class="prog-bar-fill" style="width:70%"></div></div><div class="prog-val">100%</div></div>
-                    <div class="progress-row"><div class="prog-label">LST</div><div class="prog-val">17.3°C</div><div class="prog-bar-bg"><div class="prog-bar-fill" style="width:60%; background: #f59e0b;"></div></div><div class="prog-val">95%</div></div>
-                    <div class="progress-row"><div class="prog-label">NDSI</div><div class="prog-val">-0.08</div><div class="prog-bar-bg"><div class="prog-bar-fill" style="width:10%; background: #06b6d4;"></div></div><div class="prog-val">95%</div></div>
-                    <button class="btn btn-outline" style="width: 100%;">Ver todos los índices</button>
-                </div>
-            </div>
+    <div class="card-header">📉 ESTADÍSTICAS DEL ÍNDICE CALCULADO</div>
+    <div class="card-body" style="gap:8px; max-height: 400px; overflow-y: auto;">
+        
+        <!-- Vegetación (Verdes) -->
+        <div class="progress-row">
+            <div class="prog-label">NDVI</div>
+            <div class="prog-val" id="val-NDVI">--</div>
+            <div class="prog-bar-bg"><div class="prog-bar-fill" id="bar-NDVI" style="width:0%; background: #22c55e;"></div></div>
+        </div>
+        <div class="progress-row">
+            <div class="prog-label">EVI</div>
+            <div class="prog-val" id="val-EVI">--</div>
+            <div class="prog-bar-bg"><div class="prog-bar-fill" id="bar-EVI" style="width:0%; background: #22c55e;"></div></div>
+        </div>
+        <div class="progress-row">
+            <div class="prog-label">SAVI</div>
+            <div class="prog-val" id="val-SAVI">--</div>
+            <div class="prog-bar-bg"><div class="prog-bar-fill" id="bar-SAVI" style="width:0%; background: #22c55e;"></div></div>
+        </div>
+        <div class="progress-row">
+            <div class="prog-label">GCI</div>
+            <div class="prog-val" id="val-GCI">--</div>
+            <div class="prog-bar-bg"><div class="prog-bar-fill" id="bar-GCI" style="width:0%; background: #10b981;"></div></div>
+        </div>
+        <div class="progress-row">
+            <div class="prog-label">MSAVI</div>
+            <div class="prog-val" id="val-MSAVI">--</div>
+            <div class="prog-bar-bg"><div class="prog-bar-fill" id="bar-MSAVI" style="width:0%; background: #10b981;"></div></div>
+        </div>
+        <div class="progress-row">
+            <div class="prog-label">ARVI</div>
+            <div class="prog-val" id="val-ARVI">--</div>
+            <div class="prog-bar-bg"><div class="prog-bar-fill" id="bar-ARVI" style="width:0%; background: #10b981;"></div></div>
+        </div>
+        <div class="progress-row">
+            <div class="prog-label">NDRE</div>
+            <div class="prog-val" id="val-NDRE">--</div>
+            <div class="prog-bar-bg"><div class="prog-bar-fill" id="bar-NDRE" style="width:0%; background: #15803d;"></div></div>
+        </div>
+
+        <!-- Agua y Humedad (Azules) -->
+        <div class="progress-row">
+            <div class="prog-label">NDWI</div>
+            <div class="prog-val" id="val-NDWI">--</div>
+            <div class="prog-bar-bg"><div class="prog-bar-fill" id="bar-NDWI" style="width:0%; background: #3b82f6;"></div></div>
+        </div>
+        <div class="progress-row">
+            <div class="prog-label">MNDWI</div>
+            <div class="prog-val" id="val-MNDWI">--</div>
+            <div class="prog-bar-bg"><div class="prog-bar-fill" id="bar-MNDWI" style="width:0%; background: #2563eb;"></div></div>
+        </div>
+        <div class="progress-row">
+            <div class="prog-label">NDMI</div>
+            <div class="prog-val" id="val-NDMI">--</div>
+            <div class="prog-bar-bg"><div class="prog-bar-fill" id="bar-NDMI" style="width:0%; background: #0ea5e9;"></div></div>
+        </div>
+        <div class="progress-row">
+            <div class="prog-label">LSWI</div>
+            <div class="prog-val" id="val-LSWI">--</div>
+            <div class="prog-bar-bg"><div class="prog-bar-fill" id="bar-LSWI" style="width:0%; background: #0284c7;"></div></div>
+        </div>
+
+        <!-- Nieve y Hielo (Cian) -->
+        <div class="progress-row">
+            <div class="prog-label">NDSI</div>
+            <div class="prog-val" id="val-NDSI">--</div>
+            <div class="prog-bar-bg"><div class="prog-bar-fill" id="bar-NDSI" style="width:0%; background: #06b6d4;"></div></div>
+        </div>
+
+        <!-- Suelo Desnudo y Fuego (Naranjas/Rojos/Grises) -->
+        <div class="progress-row">
+            <div class="prog-label">BAI</div>
+            <div class="prog-val" id="val-BAI">--</div>
+            <div class="prog-bar-bg"><div class="prog-bar-fill" id="bar-BAI" style="width:0%; background: #ef4444;"></div></div>
+        </div>
+        <div class="progress-row">
+            <div class="prog-label">BSI</div>
+            <div class="prog-val" id="val-BSI">--</div>
+            <div class="prog-bar-bg"><div class="prog-bar-fill" id="bar-BSI" style="width:0%; background: #f59e0b;"></div></div>
+        </div>
+        <div class="progress-row">
+            <div class="prog-label">NBR</div>
+            <div class="prog-val" id="val-NBR">--</div>
+            <div class="prog-bar-bg"><div class="prog-bar-fill" id="bar-NBR" style="width:0%; background: #78716c;"></div></div>
+        </div>
+
+        <!-- Pigmentos (Amarillo) -->
+        <div class="progress-row">
+            <div class="prog-label">CRI</div>
+            <div class="prog-val" id="val-CRI">--</div>
+            <div class="prog-bar-bg"><div class="prog-bar-fill" id="bar-CRI" style="width:0%; background: #eab308;"></div></div>
+        </div>
+
+    </div>
+</div>
 
             <div class="card" style="flex:1;">
                 <div class="card-header">ℹ️ INFORMACIÓN DEL ÍNDICE</div>
