@@ -180,18 +180,64 @@
     <div class="workspace">
         <!-- ================= COLUMNA IZQUIERDA ================= -->
       <div class="col-left">
-            <div class="card">
-                <div class="card-header">⚙️ CONFIGURACIÓN DE ANÁLISIS</div>
-                <div class="card-body">
-                    <div class="form-group">
-                        <label>1. ENFOQUE DE CONSULTA</label><span class="sub">Modalidad de Análisis</span>
-                        <select class="form-control"><option>Áreas Naturales y Conservación (ANPs)</option></select>
-                    </div>
-                    <div class="form-group">
-                        <label>2. LÍMITES CARTOGRÁFICOS</label><span class="sub">Categoría: ACP</span>
-                        <select class="form-control" style="margin-bottom: 4px;"><option>Área de Estudio Específico</option></select>
-                        <select class="form-control"><option>BOSQUE NATURAL EL CAÑONCILLO</option></select>
-                    </div> 
+    <div class="card">
+        <div class="card-header">⚙️ CONFIGURACIÓN DE ANÁLISIS</div>
+        <div class="card-body">
+            
+            <!-- 1. ENFOQUE DE CONSULTA -->
+            <div class="form-group">
+                <label>1. ENFOQUE DE CONSULTA</label><span class="sub">Modalidad de Análisis</span>
+                <select id="tipoConsulta" class="form-control">
+                    <option value="conservacion">Áreas Naturales y Conservación (ANPs)</option>
+                    <option value="politico">División Político-Administrativa</option>
+                </select>
+            </div>
+
+            <!-- 2. LÍMITES CARTOGRÁFICOS (MODO CONSERVACIÓN) -->
+            <div id="grupoAmbiental">
+                <div class="form-group">
+                    <label>2. LÍMITES CARTOGRÁFICOS</label><span class="sub">Categoría de Conservación</span>
+                    <!-- Agregamos el style="margin-bottom: 4px;" igual que en tu original para que no se peguen -->
+                    <select id="capaAmbiental" class="form-control" style="margin-bottom: 4px;">
+                        <option value="Seleccione...">Seleccione una categoría...</option>
+                        <option value="anpdefinitivas">ANP Administración Nacional</option>
+                        <option value="acr">Áreas de Conservación Regional (ACR)</option>
+                        <option value="acp">Áreas de Conservación Privada (ACP)</option>
+                        <option value="zona_reservada">Zonas Reservadas</option>
+                        <option value="zona_de_amortiguamiento">Zonas de Amortiguamiento</option>
+                    </select>
+                    
+                    <span class="sub">Área de Estudio Específica</span>
+                    <select id="nombreArea" class="form-control" disabled>
+                        <option value="Seleccione...">Seleccione una categoría primero...</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 2. LÍMITES CARTOGRÁFICOS (MODO POLÍTICO - Inicia oculto) -->
+            <div id="grupoPolitico" style="display: none;">
+                <div class="form-group">
+                    <label>2. LÍMITES CARTOGRÁFICOS</label><span class="sub">Ubicación Política</span>
+                    <select id="departamento" class="form-control" style="margin-bottom: 4px;">
+                        <option value="Seleccione...">Cargando departamentos...</option>
+                    </select>
+                    <select id="provincia" class="form-control" style="margin-bottom: 4px;">
+                        <option value="Seleccione...">Seleccione provincia...</option>
+                    </select>
+                    <select id="distrito" class="form-control">
+                        <option value="Seleccione...">Seleccione distrito...</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- =========================================================
+                 A PARTIR DE AQUÍ, DEJA TUS OTRAS SECCIONES EXACTAMENTE 
+                 COMO LAS TIENES (3. PARÁMETROS DE MISIÓN, etc.) 
+            ========================================================== -->
+            
+        </div>
+    </div>
+</div>
                     <div class="info-area-box">
                         <div style="color: var(--success); font-weight: 800; font-size: 10px;">🌲 INFORMACIÓN DEL ÁREA</div>
                         <div class="info-grid">
