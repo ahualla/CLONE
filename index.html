@@ -584,10 +584,14 @@ L.polygon(innerCoords, { color: '#15803d', fillColor: '#15803d', fillOpacity: 0.
  
 L.marker([-7.38, -79.40]).addTo(map);
 
-            /* ================= MINI MAPA (MAPA DE CAMBIO) ================= */
-            const miniMap = L.map('mini-map', { zoomControl: false, attributionControl: false }).setView([-7.38, -79.43], 10);
-            L.polygon(baseCoords, { color: '#dc2626', fillColor: '#dc2626', fillOpacity: 0.6, weight: 0 }).addTo(miniMap);
-            L.polygon(midCoords, { color: '#15803d', fillColor: '#15803d', fillOpacity: 0.7, weight: 0 }).addTo(miniMap);
+/* ================= MINI MAPA (MAPA DE CAMBIO) ================= */
+const miniMap = L.map('mini-map', { zoomControl: false, attributionControl: false }).setView([-7.38, -79.43], 10);
+
+// Agregamos la capa base de OpenStreetMap
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(miniMap);
+
+L.polygon(baseCoords, { color: '#dc2626', fillColor: '#dc2626', fillOpacity: 0.6, weight: 0 }).addTo(miniMap);
+L.polygon(midCoords, { color: '#15803d', fillColor: '#15803d', fillOpacity: 0.7, weight: 0 }).addTo(miniMap);
 
             setTimeout(() => { map.invalidateSize(); miniMap.invalidateSize(); }, 500);
 
