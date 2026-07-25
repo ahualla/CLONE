@@ -564,18 +564,25 @@
         document.addEventListener('DOMContentLoaded', () => {
             
             /* ================= MAPA PRINCIPAL ================= */
-            const map = L.map('main-map', { zoomControl: false }).setView([-7.38, -79.43], 12);
-            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}').addTo(map);
+// Inicializamos el mapa (habilitando el control de zoom por defecto)
+const map = L.map('main-map').setView([-7.38, -79.43], 12);
 
-            // Polígono complejo simulando el raster de la 3ra imagen
-            const baseCoords = [[-7.25, -79.45], [-7.28, -79.35], [-7.35, -79.30], [-7.45, -79.32], [-7.55, -79.38], [-7.50, -79.48], [-7.40, -79.50], [-7.30, -79.48]];
-            L.polygon(baseCoords, { color: '#fcd34d', fillColor: '#fcd34d', fillOpacity: 0.6, weight: 1 }).addTo(map);
-            const midCoords = [[-7.30, -79.42], [-7.32, -79.38], [-7.38, -79.35], [-7.45, -79.38], [-7.48, -79.42], [-7.42, -79.45]];
-            L.polygon(midCoords, { color: '#84cc16', fillColor: '#84cc16', fillOpacity: 0.7, weight: 1 }).addTo(map);
-            const innerCoords = [[-7.35, -79.40], [-7.36, -79.39], [-7.40, -79.38], [-7.42, -79.40], [-7.39, -79.42]];
-            L.polygon(innerCoords, { color: '#15803d', fillColor: '#15803d', fillOpacity: 0.8, weight: 1 }).addTo(map);
-            
-            L.marker([-7.38, -79.40]).addTo(map);
+// Capa base de OpenStreetMap (extraída de tu HTML)
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+// Polígono complejo simulando el raster de la 3ra imagen
+const baseCoords = [[-7.25, -79.45], [-7.28, -79.35], [-7.35, -79.30], [-7.45, -79.32], [-7.55, -79.38], [-7.50, -79.48], [-7.40, -79.50], [-7.30, -79.48]];
+L.polygon(baseCoords, { color: '#fcd34d', fillColor: '#fcd34d', fillOpacity: 0.6, weight: 1 }).addTo(map);
+
+const midCoords = [[-7.30, -79.42], [-7.32, -79.38], [-7.38, -79.35], [-7.45, -79.38], [-7.48, -79.42], [-7.42, -79.45]];
+L.polygon(midCoords, { color: '#84cc16', fillColor: '#84cc16', fillOpacity: 0.7, weight: 1 }).addTo(map);
+
+const innerCoords = [[-7.35, -79.40], [-7.36, -79.39], [-7.40, -79.38], [-7.42, -79.40], [-7.39, -79.42]];
+L.polygon(innerCoords, { color: '#15803d', fillColor: '#15803d', fillOpacity: 0.8, weight: 1 }).addTo(map);
+ 
+L.marker([-7.38, -79.40]).addTo(map);
 
             /* ================= MINI MAPA (MAPA DE CAMBIO) ================= */
             const miniMap = L.map('mini-map', { zoomControl: false, attributionControl: false }).setView([-7.38, -79.43], 10);
