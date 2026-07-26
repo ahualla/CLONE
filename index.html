@@ -178,76 +178,164 @@
     </header>
 
     <div class="workspace">
-        <!-- ================= COLUMNA IZQUIERDA ================= -->
-     <div class="col-left">
-            <div class="card">
-                <div class="card-header">⚙️ CONFIGURACIÓN DE ANÁLISIS</div>
-                <div class="card-body">
-                    <div class="form-group">
-                        <label>1. ENFOQUE DE CONSULTA</label><span class="sub">Modalidad de Análisis</span>
-                        <select class="form-control"><option>Áreas Naturales y Conservación (ANPs)</option></select>
-                    </div>
+       <!-- ================= COLUMNA IZQUIERDA ================= -->
+<div class="col-left">
+    <div class="card">
+        <div class="card-header">⚙️ CONFIGURACIÓN DE ANÁLISIS</div>
+        <div class="card-body">
+            
+            <!-- 1. ENFOQUE DE CONSULTA -->
+            <div class="form-group">
+                <label>1. ENFOQUE DE CONSULTA</label><span class="sub">Modalidad de Análisis</span>
+                <select id="tipoConsulta" class="form-control">
+                    <option value="conservacion" selected>Áreas Naturales y Conservación (ANPs)</option>
+                    <option value="politico">Límites Políticos (Ubigeo)</option>
+                </select>
+            </div>
 
-                    <div class="form-group">
-                        <label>2. LÍMITES CARTOGRÁFICOS</label><span class="sub">Categoría: ACP</span>
-                        <select class="form-control" style="margin-bottom: 4px;"><option>Área de Estudio Específico</option></select>
-                        <select class="form-control"><option>BOSQUE NATURAL EL CAÑONCILLO</option></select>
-                    </div> 
-                    <div class="info-area-box">
-                        <div style="color: var(--success); font-weight: 800; font-size: 10px;">🌲 INFORMACIÓN DEL ÁREA</div>
-                        <div class="info-grid">
-                            <span style="color:var(--text-muted)">Categoría:</span> <strong>Bosque Natural Privado</strong>
-                            <span style="color:var(--text-muted)">Código:</span> <strong>ACP-50-77-001</strong>
-                            <span style="color:var(--text-muted)">Departamento:</span> <strong>La Libertad</strong>
-                            <span style="color:var(--text-muted)">Provincia:</span> <strong>Santiago de Chuco</strong>
-                            <span style="color:var(--text-muted)">Distrito:</span> <strong>Santiago de Chuco</strong>
-                            <span style="color:var(--text-muted)">Área Oficial:</span> <strong>15.01 km²</strong>
-                            <span style="color:var(--text-muted)">Año Creación:</span> <strong>16 / 07 / 2026</strong>
-                        </div>
-                        <button class="btn btn-outline" style="width: 100%; margin-top: 8px; font-size: 9px;">Ver Ficha Técnica ↗</button>
-                    </div>
+            <!-- 2. LÍMITES CARTOGRÁFICOS -->
+            <div class="form-group">
+                <label>2. LÍMITES CARTOGRÁFICOS</label>
+                
+                <!-- GRUPO AMBIENTAL -->
+                <div id="grupoAmbiental">
+                    <span class="sub">Categoría</span>
+                    <select id="capaAmbiental" class="form-control" style="margin-bottom: 4px;">
+                        <option value="Seleccione...">Seleccione categoría...</option>
+                        <option value="acp">ACP - Área de Conservación Privada</option>
+                        <option value="acr">ACR - Área de Conservación Regional</option>
+                        <option value="zona_reservada">Zona Reservada</option>
+                        <option value="anpdefinitivas">ANP Definitivas</option>
+                        <option value="zona_de_amortiguamiento">Zona de Amortiguamiento</option>
+                    </select>
+                    
+                    <span class="sub">Área de Estudio Específico</span>
+                    <select id="nombreArea" class="form-control" disabled>
+                        <option value="Seleccione...">Seleccione una categoría primero...</option>
+                    </select>
+                </div>
 
-                    <div class="form-group">
-                        <label>3. PARÁMETROS DE MISIÓN</label><span class="sub">Sensor Satelital</span>
-                        <select class="form-control" style="margin-bottom: 4px;"><option>Landsat 5 TM (1984 - 2011)</option></select>
-                        <span class="sub">Objetivo del Estudio</span>
-                        <select class="form-control" style="margin-bottom: 4px;"><option>Análisis de Vegetación</option></select>
-                        <span class="sub">Índice Espectral</span>
-                        <select class="form-control"><option>NDVI</option></select>
-                    </div>
+                <!-- GRUPO POLÍTICO (Oculto por defecto) -->
+                <div id="grupoPolitico" style="display: none;">
+                    <span class="sub">Departamento</span>
+                    <select id="departamento" class="form-control" style="margin-bottom: 4px;">
+                        <option value="Seleccione...">Cargando...</option>
+                    </select>
+                    
+                    <span class="sub">Provincia</span>
+                    <select id="provincia" class="form-control" style="margin-bottom: 4px;">
+                        <option value="Seleccione...">Seleccione...</option>
+                    </select>
+                    
+                    <span class="sub">Distrito</span>
+                    <select id="distrito" class="form-control">
+                        <option value="Seleccione...">Seleccione...</option>
+                    </select>
+                </div>
+            </div> 
 
-                    <div class="form-group">
-                        <label>4. TEMPORALIDAD DE ANÁLISIS</label>
-                        <div style="display: flex; justify-content: space-between; font-size: 9px; margin-bottom: 2px;">
-                            <span>Año inicial: 1984</span><span>Año final: 2011</span>
-                        </div>
-                        <input type="range" style="width: 100%; accent-color: var(--success);" min="1984" max="2011" value="2011">
-                    </div>
+            <!-- TARJETA INFO (El área oficial se llenará dinámicamente) -->
+            <div class="info-area-box">
+                <div style="color: var(--success); font-weight: 800; font-size: 10px;">🌲 INFORMACIÓN DEL ÁREA</div>
+                <div class="info-grid">
+                    <span style="color:var(--text-muted)">Categoría:</span> <strong>-</strong>
+                    <span style="color:var(--text-muted)">Código:</span> <strong>-</strong>
+                    <span style="color:var(--text-muted)">Departamento:</span> <strong>-</strong>
+                    <span style="color:var(--text-muted)">Provincia:</span> <strong>-</strong>
+                    <span style="color:var(--text-muted)">Distrito:</span> <strong>-</strong>
+                    <span style="color:var(--text-muted)">Área Oficial:</span> <strong id="resArea">0 km²</strong>
+                    <span style="color:var(--text-muted)">Año Creación:</span> <strong>-</strong>
+                </div>
+                <button class="btn btn-outline" style="width: 100%; margin-top: 8px; font-size: 9px;">Ver Ficha Técnica ↗</button>
+            </div>
 
-                    <div class="form-group">
-                        <label>5. EXPORTACIÓN DE DATOS</label>
-                        <div class="export-grid">
-                            <div class="export-btn"><span>📄</span>GeoTIFF</div>
-                            <div class="export-btn"><span>🗺️</span>SHP</div>
-                            <div class="export-btn"><span>📊</span>CSV</div>
-                            <div class="export-btn"><span>🖼️</span>PNG</div>
-                            <div class="export-btn"><span>📋</span>Excel</div>
-                            <div class="export-btn"><span>PDF</span>Reporte</div>
-                        </div>
-                    </div>
+            <!-- 3. PARÁMETROS DE MISIÓN -->
+            <div class="form-group">
+                <label>3. PARÁMETROS DE MISIÓN</label>
+                <span class="sub">Sensor Satelital</span>
+                <select id="satelite" class="form-control" style="margin-bottom: 4px;">
+                    <option value="Landsat 5">Landsat 5 TM (1984 - 2011)</option>
+                    <option value="Landsat 7">Landsat 7 (1999 - 2021)</option>
+                    <option value="Landsat 8">Landsat 8 (2013 - 2026)</option>
+                    <option value="Landsat 9">Landsat 9 (2021 - 2026)</option>
+                    <option value="Sentinel 2">Sentinel 2 (2015 - 2026)</option>
+                </select>
+                
+                <span class="sub">Objetivo del Estudio</span>
+                <select id="objetivo" class="form-control" style="margin-bottom: 4px;">
+                    <option value="Vegetación">Análisis de Vegetación</option>
+                    <option value="Agua">Agua</option>
+                    <option value="Área Glacial">Área Glacial</option>
+                    <option value="Temperatura">Temperatura</option>
+                    <option value="Suelo">Suelo</option>
+                    <option value="Área Urbana">Área Urbana</option>
+                    <option value="Incendios y Antropización">Incendios y Antropización</option>
+                </select>
+                
+                <span class="sub">Índice Espectral</span>
+                <select id="indice" class="form-control">
+                    <!-- Se llena con JS -->
+                </select>
+            </div>
 
-                    <div class="card" style="border:none; border-top:1px solid var(--border-color); border-radius:0; padding-top:8px;">
-                        <div style="font-weight:700; font-size:10px; margin-bottom:4px;">🕒 6. HISTORIAL DE CONSULTAS</div>
-                        <table class="table" style="font-size: 8px;">
-                            <tr><td>17/07/2026</td><td>Cañoncillo</td><td>NDVI</td><td>1994-2011</td></tr>
-                            <tr><td>15/07/2026</td><td>Cañoncillo</td><td>NDVI</td><td>1994-2011</td></tr>
-                            <tr><td>12/07/2026</td><td>Cañoncillo</td><td>NDVI</td><td>1994-2011</td></tr>
-                        </table>
-                        <button class="btn btn-outline" style="width: 100%; margin-top: 6px; font-size:8px;">Limpiar historial</button>
+            <!-- 4. TEMPORALIDAD DE ANÁLISIS (Cambiado a selectores por JS) -->
+            <div class="form-group">
+                <label>4. TEMPORALIDAD DE ANÁLISIS</label>
+                <div style="display: flex; gap: 10px; margin-top: 4px;">
+                    <div style="flex: 1;">
+                        <span class="sub">Año inicial</span>
+                        <select id="anioInicio" class="form-control"></select>
+                    </div>
+                    <div style="flex: 1;">
+                        <span class="sub">Año final</span>
+                        <select id="anioFinal" class="form-control"></select>
                     </div>
                 </div>
             </div>
+
+            <!-- BOTONES DE ACCIÓN (Vitales para app.js) -->
+            <div class="form-group">
+                <button id="consultar" class="btn" style="width: 100%; background: var(--success); color: white; border: none; padding: 10px; font-weight: bold; border-radius: 4px;">EJECUTAR ANÁLISIS</button>
+                <button id="limpiar" class="btn btn-outline" style="width: 100%; margin-top: 5px;">Limpiar parámetros</button>
+            </div>
+
+            <!-- 5. EXPORTACIÓN DE DATOS -->
+            <div class="form-group">
+                <label>5. EXPORTACIÓN DE DATOS</label>
+                <div class="export-grid">
+                    <div class="export-btn" id="btnTiff" style="cursor: pointer;"><span>📄</span>GeoTIFF</div>
+                    <div class="export-btn" id="btnShp" style="cursor: pointer;"><span>🗺️</span>SHP</div>
+                    <div class="export-btn" style="cursor: not-allowed; opacity: 0.5;"><span>📊</span>CSV</div>
+                    <div class="export-btn" id="btnPng" style="cursor: pointer;"><span>🖼️</span>PNG</div>
+                    <div class="export-btn" style="cursor: not-allowed; opacity: 0.5;"><span>📋</span>Excel</div>
+                    <div class="export-btn" id="btnPdf" style="cursor: pointer;"><span>PDF</span>Reporte</div>
+                </div>
+            </div>
+
+            <!-- 6. HISTORIAL DE CONSULTAS -->
+            <div class="card" style="border:none; border-top:1px solid var(--border-color); border-radius:0; padding-top:8px;">
+                <div style="font-weight:700; font-size:10px; margin-bottom:4px;">🕒 6. HISTORIAL DE CONSULTAS</div>
+                <table class="table" style="font-size: 8px;">
+                    <thead>
+                        <tr>
+                            <th>Dep/Área</th>
+                            <th>Prov.</th>
+                            <th>Dist.</th>
+                            <th>Índice</th>
+                            <th>Año</th>
+                            <th>Satélite</th>
+                            <th>km²</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaResultados">
+                        <!-- Las consultas se agregarán aquí -->
+                    </tbody>
+                </table>
+            </div>
+
         </div>
+    </div>
+</div>
 
         <!-- ================= COLUMNA CENTRAL ================= -->
         <div class="col-center">
