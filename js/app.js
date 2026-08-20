@@ -1,6 +1,6 @@
 /*=======================================================================
-        GEOSPATIAL PERÚ - app.js
-        Controlador principal GIS con Integración Científica y ANPs
+        GEOSPATIAL PERÚ - app.js (Versión Consolidada y Optimizada)
+        Controlador principal GIS con Integración Científica, ANPs y GEE
         
         AUTOR ORIGINAL: Ing. Ambiental Alessandro Alonso Ahualla Molina
         CANAL DE YOUTUBE: Proyectos SIG
@@ -13,13 +13,25 @@
 =========================================*/
 const map = L.map('map').setView([-9.19, -75.0152], 6);
 
-// Capa base estándar (OpenStreetMap)
+// Capas Base
 const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
-let capaGeoJson; // Capa para dibujar el polígono seleccionado
-let marker;      // Marcador informativo flotante
+const esriSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri'
+});
+
+// Control de Capas Base
+L.control.layers({
+    "OpenStreetMap": osm,
+    "Satelital (Esri)": esriSat
+}, null, { position: 'topright' }).addTo(map);
+
+let capaGeoJson = null; // Capa para dibujar el polígono seleccionado
+let marker = null;      // Marcador informativo flotante
+let capaSatelitalGEE = null;
+let ultimaGeometriaConsultada = null;
 
 /*=========================================
     2. CAPTURA DE ELEMENTOS DEL DOM
@@ -51,11 +63,19 @@ const anio            = document.getElementById("anio");
 // Tabla de historial de consultas
 const tabla           = document.getElementById("tablaResultados");
 
-// Tarjetas de resultados (Compatibilidad de selectores ID / Clases)
+// Tarjetas de resultados
 const areaTotal       = document.getElementById("resArea") || document.querySelector(".result-card:nth-child(1) h1");
 const valorProm       = document.getElementById("resProm") || document.querySelector(".result-card:nth-child(2) h1");
 const valorMax        = document.getElementById("resMax") || document.querySelector(".result-card:nth-child(3) h1");
 const valorMin        = document.getElementById("resMin") || document.querySelector(".result-card:nth-child(4) h1");
+
+// Botones de Herramientas y Exportación
+const btnGps          = document.getElementById("btnGps") || document.querySelector(".toolbar-right button:nth-child(2)");
+const btnFullscreen   = document.getElementById("btnFullscreen") || document.querySelector(".toolbar-right button:nth-child(3)");
+const btnTiff         = document.getElementById("btnTiff");
+const btnShp          = document.getElementById("btnShp");
+const btnPng          = document.getElementById("btnPng");
+const btnPdf          = document.getElementById("btnPdf");
 
 /*=========================================
     3. CONSTANTES Y MATRICES CIENTÍFICAS
@@ -81,7 +101,7 @@ const limitesSatelites = {
 const BASE_URL_API_REAL = "https://geovisor-uwu.onrender.com";
 
 /*=========================================
-    4. EVENTO AL CARGAR LA PÁGINA (onload)
+    4. INICIALIZACIÓN
 =========================================*/
 window.onload = () => {
     try {
@@ -90,7 +110,7 @@ window.onload = () => {
         validarYFiltrarAniosPorSatelite(); 
         escucharCambiosTipoConsulta(); 
         
-        // ⚡ DESPERTAR SERVIDOR EN SEGUNDO PLANO (Evita retrasos en la primera consulta)
+        // Despertar backend en segundo plano
         fetch(`${BASE_URL_API_REAL}/`).catch(() => console.log("Despertando servidor Render..."));
 
     } catch (error) {
@@ -133,7 +153,6 @@ function deshabilitarUbigeo(deshabilitar) {
     if (distrito) distrito.disabled = deshabilitar;
 }
 
-// Carga unificada de Áreas Naturales Protegidas sin trabar el navegador
 async function actualizarAreasEspecificas() {
     if (!capaAmbiental || !nombreArea) return;
     const capa = capaAmbiental.value;
@@ -312,7 +331,7 @@ if (provincia) {
 }
 
 /*=========================================
-    7. UNIFICADOR MULTIPOLYGON (SOPORTE GIS)
+    7. UNIFICADOR MULTIPOLYGON
 =========================================*/
 function fusionarGeometrias(features) {
     if (features.length === 1) return features[0].geometry;
@@ -325,11 +344,8 @@ function fusionarGeometrias(features) {
 }
 
 /*=========================================
-    8. EVENTO CENTRAL DE CONSULTA (PRO)
+    8. EVENTO CENTRAL DE CONSULTA
 =========================================*/
-let capaSatelitalGEE = null;
-let ultimaGeometriaConsultada = null;
-
 if (btnConsultar) {
     btnConsultar.addEventListener("click", async () => {
         const isAmbiental = tipoConsulta && tipoConsulta.value === "conservacion";
@@ -344,14 +360,14 @@ if (btnConsultar) {
         const nomArea = nombreArea?.value || "";
 
         if (parseInt(anioIni) > parseInt(anioFin)) {
-            alert("Error: El Año Inicial no puede ser mayor que el Año Final.");
+            alert("⚠️ Error: El Año Inicial no puede ser mayor que el Año Final.");
             return;
         }
 
         const loader = document.getElementById("loader");
         if (loader) loader.style.display = "flex";
 
-        // Limpieza de capas viejas
+        // Limpieza de capas anteriores
         if (capaGeoJson && map.hasLayer(capaGeoJson)) map.removeLayer(capaGeoJson);
         if (marker && map.hasLayer(marker)) map.removeLayer(marker);
         if (capaSatelitalGEE && map.hasLayer(capaSatelitalGEE)) map.removeLayer(capaSatelitalGEE);
@@ -377,7 +393,7 @@ if (btnConsultar) {
             tituloPopup = `Área: ${nomArea.toUpperCase()}`;
         } else {
             if (dep === "Seleccione...") {
-                alert("Selecciona al menos un departamento para iniciar.");
+                alert("⚠️ Selecciona al menos un departamento para iniciar.");
                 if (loader) loader.style.display = "none";
                 return;
             }
@@ -432,14 +448,12 @@ if (btnConsultar) {
             }
 
             if (featuresFiltrados.length === 0) {
-                alert(`Geometría no encontrada para: ${valorFiltro}.`);
+                alert(`⚠️ Geometría no encontrada para: ${valorFiltro}.`);
                 if (loader) loader.style.display = "none";
                 return;
             }
 
-            //  CORREGIDO: Nombre unificado en español para evitar el ReferenceError
             const geometriaUnificada = fusionarGeometrias(featuresFiltrados);
-
             const geojsonFiltrado = { 
                 type: "FeatureCollection", 
                 features: [{ type: "Feature", geometry: geometriaUnificada, properties: { name: valorFiltro } }] 
@@ -449,7 +463,6 @@ if (btnConsultar) {
                 { color: "#27ae60", weight: 3, opacity: 0.9, fillColor: "#2ecc71", fillOpacity: 0.12 } : 
                 { color: "#e74c3c", weight: 3, opacity: 0.9, fillColor: "#f1c40f", fillOpacity: 0.12 };
 
-            // Dibujar instantáneamente los límites del mapa
             capaGeoJson = L.geoJSON(geojsonFiltrado, { style: estiloPoligono }).addTo(map);
             const limites = capaGeoJson.getBounds();
 
@@ -460,24 +473,19 @@ if (btnConsultar) {
                 marker = L.marker(centro).addTo(map).bindPopup(popText).openPopup();
             }
 
-            // Actualizar paneles visuales rápidamente
             if (indiceNombre) indiceNombre.textContent = ind;
             if (sensor) sensor.textContent = sat;
             if (anio) anio.textContent = anioIni === anioFin ? `${anioIni}` : `${anioIni} - ${anioFin}`;
 
-            // Guardamos la variable corregida
             ultimaGeometriaConsultada = geometriaUnificada;
-
-            // Apagamos el loader global para que el mapa no se congele
             if (loader) loader.style.display = "none";
 
-            // Colocar las tarjetas en modo de carga interactiva
             if (areaTotal) areaTotal.textContent = "Calculando...";
             if (valorProm) valorProm.textContent = "⏳...";
             if (valorMax) valorMax.textContent = "⏳...";
             if (valorMin) valorMin.textContent = "⏳...";
 
-            // 🔥 HILO ASÍNCRONO NO BLOQUEANTE: El motor de análisis trabaja en la sombra
+            // Consulta asíncrona a Earth Engine
             (async () => {
                 try {
                     const respuestaBackend = await fetch(`${BASE_URL_API_REAL}/calcular-indice-zona`, {
@@ -486,13 +494,12 @@ if (btnConsultar) {
                         body: JSON.stringify({
                             indice: ind,
                             año: parseInt(anioIni),
-                            geometria: geometriaUnificada //  CORREGIDO
+                            geometria: geometriaUnificada
                         })
                     });
 
-                    // Control de error de tamaño de payload (154MB de tu imagen)
                     if (respuestaBackend.status === 413 || respuestaBackend.status === 502) {
-                        throw new Error("La geometría seleccionada es demasiado pesada. Por favor simplifica el GeoJSON.");
+                        throw new Error("Geometría demasiado pesada.");
                     }
 
                     const resultadoBackend = await respuestaBackend.json();
@@ -520,8 +527,8 @@ if (btnConsultar) {
                         generarResultadosManejoFallas();
                     }
                 } catch (err) {
-                    console.error("Error asíncrono con GEE:", err);
-                    alert("⚠️ Error: Los límites del área seleccionada son extremadamente pesados para ser procesados por la API. Reduce el detalle de los GeoJSON.");
+                    console.error("Error en motor GEE:", err);
+                    alert("⚠️ Error: La geometría seleccionada es muy compleja o hubo un fallo de procesamiento en backend.");
                     generarResultadosManejoFallas();
                 }
             })();
@@ -535,7 +542,7 @@ if (btnConsultar) {
 }
 
 /*=========================================
-    9. HISTORIAL DE RESULTADOS (TABLA)
+    9. HISTORIAL DE RESULTADOS
 =========================================*/
 function agregarTabla(dep, prov, dist, ind, anioIni, sat, areaKm2) {
     if (!tabla) return;
@@ -563,7 +570,7 @@ function generarResultadosManejoFallas() {
 }
 
 /*=========================================
-    10. BOTÓN LIMPIAR PANEL Y CAPAS
+    10. BOTÓN LIMPIAR
 =========================================*/
 if (btnLimpiar) {
     btnLimpiar.addEventListener("click", () => {
@@ -610,41 +617,40 @@ if (btnLimpiar) {
 }
 
 /*=========================================
-    11. GPS Y CONTROL FULLSCREEN
+    11. GPS Y CONTROLES DE PANTALLA
 =========================================*/
-const btnGps = document.querySelector(".toolbar-right button:nth-child(2)");
 if (btnGps) {
     btnGps.addEventListener("click", () => {
-        map.locate({ setView: true, maxZoom: 10 });
-        map.on("locationfound", e => {
+        map.locate({ setView: true, maxZoom: 12 });
+        map.once("locationfound", e => {
             if (marker && map.hasLayer(marker)) map.removeLayer(marker);
-            marker = L.marker(e.latlng).addTo(map).bindPopup("Ubicación GPS").openPopup();
+            marker = L.marker(e.latlng).addTo(map).bindPopup("📍 Tu ubicación actual").openPopup();
+        });
+        map.once("locationerror", () => {
+            alert("⚠️ No se pudo obtener la ubicación GPS.");
         });
     });
 }
 
-const btnFullscreen = document.querySelector(".toolbar-right button:nth-child(3)");
 if (btnFullscreen) {
     btnFullscreen.addEventListener("click", () => {
         const elem = document.getElementById("map");
         if (!elem) return;
-        if (!document.fullscreenElement) elem.requestFullscreen();
-        else document.exitFullscreen();
+        if (!document.fullscreenElement) {
+            elem.requestFullscreen().catch(err => alert(`Error al activar pantalla completa: ${err.message}`));
+        } else {
+            document.exitFullscreen();
+        }
     });
 }
 
 /*=========================================
-    12. EXPORTACIÓN DE RESULTADOS (PRO)
+    12. EXPORTACIÓN DE RESULTADOS
 =========================================*/
-const btnTiff = document.getElementById("btnTiff");
-const btnShp  = document.getElementById("btnShp");
-const btnPng  = document.getElementById("btnPng");
-const btnPdf  = document.getElementById("btnPdf");
-
 if (btnTiff) {
     btnTiff.addEventListener("click", async (e) => {
         e.preventDefault();
-        if (!ultimaGeometriaConsultada) return alert("⚠️ No hay geometría consultada activa.");
+        if (!ultimaGeometriaConsultada) return alert("⚠️ No hay consulta activa con geometría.");
         const loader = document.getElementById("loader");
         if (loader) loader.style.display = "flex";
 
@@ -662,10 +668,10 @@ if (btnTiff) {
             if (data.status === "success" && data.download_url) {
                 window.location.href = data.download_url;
             } else {
-                alert("❌ Error generando descarga TIFF.");
+                alert("❌ Error al generar la descarga del archivo TIFF.");
             }
         } catch {
-            alert("❌ Falló la conexión con el servidor.");
+            alert("❌ Error de comunicación con el servidor.");
         } finally {
             if (loader) loader.style.display = "none";
         }
@@ -676,13 +682,13 @@ if (btnShp) {
     btnShp.addEventListener("click", (e) => {
         e.preventDefault();
         const isAmbiental = tipoConsulta && tipoConsulta.value === "conservacion";
-        if (!isAmbiental && (departamento.value === "Seleccione..." || !departamento.value)) return alert("⚠️ Realiza una consulta primero.");
+        if (!isAmbiental && (departamento.value === "Seleccione..." || !departamento.value)) return alert("⚠️ Realiza una consulta territorial o ambiental primero.");
         
         const pDep = isAmbiental ? "Area Ambiental" : departamento.value;
         const pProv = isAmbiental ? capaAmbiental.value.toUpperCase() : provincia.value;
         const pDist = isAmbiental ? nombreArea.value : distrito.value;
 
-        window.location.href = `${BASE_URL_API_REAL}/descargar-shp?dep=${pDep}&prov=${pProv}&dist=${pDist}`;
+        window.location.href = `${BASE_URL_API_REAL}/descargar-shp?dep=${encodeURIComponent(pDep)}&prov=${encodeURIComponent(pProv)}&dist=${encodeURIComponent(pDist)}`;
     });
 }
 
@@ -696,12 +702,17 @@ if (btnPng) {
         if (typeof html2canvas !== "undefined" && contenedorMapa) {
             const loader = document.getElementById("loader");
             if (loader) loader.style.display = "flex";
-            html2canvas(contenedorMapa, { useCORS: true }).then(canvas => {
+            html2canvas(contenedorMapa, { useCORS: true, allowTaint: false }).then(canvas => {
                 const link = document.createElement("a");
                 link.download = `MAPA_${indice.value}_${anioInicio.value}.png`;
                 link.href = canvas.toDataURL("image/png");
                 link.click();
+            }).catch(err => {
+                console.error("Error captura PNG:", err);
+                alert("❌ No se pudo capturar la imagen del mapa.");
             }).finally(() => { if (loader) loader.style.display = "none"; });
+        } else {
+            alert("⚠️ La librería html2canvas no está cargada.");
         }
     });
 }
@@ -709,7 +720,7 @@ if (btnPng) {
 if (btnPdf) {
     btnPdf.addEventListener("click", async (e) => {
         e.preventDefault();
-        if (!ultimaGeometriaConsultada) return alert("⚠️ No hay consulta activa.");
+        if (!ultimaGeometriaConsultada) return alert("⚠️ Realiza una consulta antes de descargar el reporte.");
         const loader = document.getElementById("loader");
         if (loader) loader.style.display = "flex";
 
@@ -736,10 +747,10 @@ if (btnPdf) {
                 link.download = `REPORTE_${indice.value}_${anioInicio.value}.pdf`;
                 link.click();
             } else {
-                alert("❌ Error generando PDF.");
+                alert("❌ Error al generar el archivo PDF.");
             }
         } catch {
-            alert("❌ Falló la descarga.");
+            alert("❌ Falló la descarga del PDF.");
         } finally {
             if (loader) loader.style.display = "none";
         }
